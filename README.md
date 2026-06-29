@@ -1,4 +1,4 @@
-# portfolio
+# Prtfolio
 
 ## About me
 My name is Filippo Falzi. I have a background in Mechanical Engineering, with a specialization in graphic rendering and visual communication.
