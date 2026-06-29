@@ -1,12 +1,207 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Il mio portfolio</title>
+
+  <title>Portfolio | Filippo Falzi</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 25px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 25px;
+    }
+
+    .hero {
+      min-height: 70vh;
+      padding: 100px 8%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: white;
+    }
+
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      font-size: clamp(45px, 8vw, 100px);
+      line-height: 1;
+      max-width: 900px;
+    }
+
+    .hero-description {
+      max-width: 600px;
+      margin-top: 30px;
+      color: #555;
+    }
+
+    .projects {
+      padding: 80px 8%;
+    }
+
+    .projects h2 {
+      font-size: 40px;
+      margin-bottom: 40px;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+    }
+
+    .project-card {
+      background: white;
+      padding: 35px;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      text-decoration: none;
+      color: #111;
+      transition: transform 0.2s;
+    }
+
+    .project-card:hover {
+      transform: translateY(-7px);
+    }
+
+    .project-number {
+      color: #777;
+      margin-bottom: auto;
+    }
+
+    .project-card h3 {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .about {
+      padding: 80px 8%;
+      background: #111;
+      color: white;
+    }
+
+    .about h2 {
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+
+    .about p {
+      max-width: 650px;
+      color: #ccc;
+    }
+
+    footer {
+      padding: 30px 8%;
+      background: #111;
+      color: #aaa;
+      border-top: 1px solid #333;
+    }
+
+    @media (max-width: 600px) {
+      nav {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 70px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Il mio portfolio</h1>
-  <p>Portfolio dei miei progetti universitari.</p>
+
+  <header>
+    <strong>FILIPPO FALZI</strong>
+
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <p>Graphic Engineering Student</p>
+
+      <h1>Design, visual communication and digital projects.</h1>
+
+      <p class="hero-description">
+        A selection of projects developed during my university studies.
+      </p>
+    </section>
+
+    <section class="projects" id="projects">
+      <h2>Selected projects</h2>
+
+      <div class="project-grid">
+
+        <a class="project-card" href="#">
+          <span class="project-number">01</span>
+          <h3>Project name</h3>
+          <p>Brand identity · 2025</p>
+        </a>
+
+        <a class="project-card" href="#">
+          <span class="project-number">02</span>
+          <h3>Project name</h3>
+          <p>Editorial design · 2024</p>
+        </a>
+
+        <a class="project-card" href="#">
+          <span class="project-number">03</span>
+          <h3>Project name</h3>
+          <p>Digital project · 2024</p>
+        </a>
+
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <h2>About me</h2>
+
+      <p>
+        I am a Graphic Engineering student interested in design,
+        visual communication and digital projects.
+        This portfolio includes a selection of work developed during my university studies.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 Filippo Falzi
+  </footer>
+
 </body>
 </html>
