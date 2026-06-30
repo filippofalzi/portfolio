@@ -13,8 +13,12 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: #f5f5f5;
       color: #1a1a1a;
       line-height: 1.6;
@@ -27,6 +31,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 20px;
     }
 
     nav a {
@@ -35,30 +40,70 @@
       margin-left: 25px;
     }
 
-    .hero {
-      min-height: 70vh;
-      padding: 100px 8%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background: white;
+    nav a:hover {
+      text-decoration: underline;
     }
 
-    .hero p {
-      font-size: 18px;
-      margin-bottom: 10px;
+    .hero {
+      min-height: 82vh;
+      padding: 70px 8%;
+      display: flex;
+      align-items: flex-end;
+      color: white;
+
+      background:
+        linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.88) 0%,
+          rgba(0, 0, 0, 0.48) 38%,
+          rgba(0, 0, 0, 0.08) 75%
+        ),
+        url("assets/home-illustration.jpg");
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .hero-content {
+      max-width: 760px;
+    }
+
+    .hero-label {
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
 
     .hero h1 {
-      font-size: clamp(45px, 8vw, 100px);
-      line-height: 1;
       max-width: 900px;
+      margin-bottom: 20px;
+      font-size: clamp(52px, 8vw, 100px);
+      line-height: 0.95;
+      text-shadow: 0 3px 20px rgba(0, 0, 0, 0.45);
     }
 
     .hero-description {
-      max-width: 600px;
-      margin-top: 30px;
-      color: #555;
+      max-width: 620px;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 19px;
+    }
+
+    .hero-button {
+      display: inline-block;
+      padding: 14px 22px;
+      background: white;
+      color: #111;
+      text-decoration: none;
+      font-weight: bold;
+      transition: transform 0.2s ease;
+    }
+
+    .hero-button:hover {
+      transform: translateY(-3px);
     }
 
     .projects {
@@ -66,8 +111,8 @@
     }
 
     .projects h2 {
-      font-size: 40px;
       margin-bottom: 40px;
+      font-size: 40px;
     }
 
     .project-grid {
@@ -77,29 +122,37 @@
     }
 
     .project-card {
-      background: white;
-      padding: 35px;
       min-height: 260px;
+      padding: 35px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      text-decoration: none;
+      background: white;
       color: #111;
-      transition: transform 0.2s;
+      text-decoration: none;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .project-card:hover {
       transform: translateY(-7px);
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.08);
     }
 
     .project-number {
-      color: #777;
       margin-bottom: auto;
+      color: #777;
     }
 
     .project-card h3 {
-      font-size: 26px;
       margin-bottom: 8px;
+      font-size: 26px;
+      line-height: 1.15;
+    }
+
+    .project-card p {
+      color: #666;
     }
 
     .about {
@@ -109,13 +162,14 @@
     }
 
     .about h2 {
-      font-size: 40px;
       margin-bottom: 20px;
+      font-size: 40px;
     }
 
     .about p {
-      max-width: 650px;
+      max-width: 700px;
       color: #ccc;
+      font-size: 18px;
     }
 
     footer {
@@ -125,13 +179,33 @@
       border-top: 1px solid #333;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
       nav {
         display: none;
       }
 
       .hero {
-        padding-top: 70px;
+        min-height: 72vh;
+        padding: 45px 7%;
+        background-position: 58% center;
+      }
+
+      .hero h1 {
+        font-size: clamp(48px, 15vw, 72px);
+      }
+
+      .hero-description {
+        font-size: 17px;
+      }
+
+      .projects,
+      .about {
+        padding: 60px 7%;
       }
     }
   </style>
@@ -152,13 +226,24 @@
   <main>
 
     <section class="hero">
-      <p>Graphic Engineering Student</p>
+      <div class="hero-content">
 
-      <h1>Design, visual communication and digital projects.</h1>
+        <p class="hero-label">
+          Computer Graphics · Rendering · Visual Communication
+        </p>
 
-      <p class="hero-description">
-        A selection of projects developed during my university studies.
-      </p>
+        <h1>Filippo Falzi</h1>
+
+        <p class="hero-description">
+          A portfolio combining technical graphics, real-time rendering,
+          computer vision and visual communication.
+        </p>
+
+        <a class="hero-button" href="#projects">
+          Explore projects
+        </a>
+
+      </div>
     </section>
 
     <section class="projects" id="projects">
@@ -167,41 +252,41 @@
       <div class="project-grid">
 
         <a class="project-card" href="projects/optical-tracking/">
-        <span class="project-number">01</span>
-        <h3>Optical Head Tracking</h3>
-        <p>Virtual Reality · Computer Vision</p>
+          <span class="project-number">01</span>
+          <h3>Optical Head Tracking</h3>
+          <p>Virtual Reality · Computer Vision</p>
         </a>
 
-         <a class="project-card" href="projects/triangle-mesh-processing/">
-        <span class="project-number">02</span>
-        <h3>Triangle Mesh Processing</h3>
-        <p>Computational Geometry · C++</p>
+        <a class="project-card" href="projects/triangle-mesh-processing/">
+          <span class="project-number">02</span>
+          <h3>Triangle Mesh Processing</h3>
+          <p>Computational Geometry · C++</p>
         </a>
 
         <a class="project-card" href="projects/monte-carlo-rendering/">
-        <span class="project-number">03</span>
-        <h3>Monte Carlo Rendering</h3>
-        <p>Path Tracing · Global Illumination</p>
+          <span class="project-number">03</span>
+          <h3>Monte Carlo Rendering</h3>
+          <p>Path Tracing · Global Illumination</p>
         </a>
 
         <a class="project-card" href="projects/vulkan-real-time-renderer/">
-        <span class="project-number">04</span>
-        <h3>Vulkan Real-Time Renderer</h3>
-        <p>PBR · SSAO · Ray-Traced Shadows</p>
+          <span class="project-number">04</span>
+          <h3>Vulkan Real-Time Renderer</h3>
+          <p>PBR · SSAO · Ray-Traced Shadows</p>
         </a>
 
         <a class="project-card" href="projects/cuda-image-filtering/">
-        <span class="project-number">05</span>
-        <h3>CUDA Image Filtering</h3>
-        <p>Parallel Computing · Edge Detection</p>
+          <span class="project-number">05</span>
+          <h3>CUDA Image Filtering</h3>
+          <p>Parallel Computing · Edge Detection</p>
         </a>
 
         <a class="project-card" href="projects/procedural-marine-scene/">
-        <span class="project-number">06</span>
-        <h3>GPU-Driven Marine Scene</h3>
-        <p>Unity · Geometry Shaders · Tessellation</p>
+          <span class="project-number">06</span>
+          <h3>GPU-Driven Marine Scene</h3>
+          <p>Unity · Geometry Shaders · Tessellation</p>
         </a>
-        
+
       </div>
     </section>
 
@@ -209,9 +294,10 @@
       <h2>About me</h2>
 
       <p>
-        I am a Graphic Engineering student interested in design,
-        visual communication and digital projects.
-        This portfolio includes a selection of work developed during my university studies.
+        I have a background in mechanical engineering and a specialisation
+        in computer graphics, rendering and visual communication. My work
+        combines technical development with a strong interest in visual design
+        and interactive digital experiences.
       </p>
     </section>
 
