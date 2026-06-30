@@ -1,0 +1,154 @@
+#pragma kernel CSMain
+
+struct FishData
+{
+    float4 position_phase; // xyz = position, w = tail phase
+    float4 velocity_orbit; // xyz = velocity, w = orbit offset
+    float4 extra; // x = height offset, yzw unused
+};
+
+RWStructuredBuffer<FishData> _FishBuffer;
+
+int _FishCount;
+float3 _FlockCenter;
+
+float _OrbitRadiusMin;
+float _OrbitRadiusMax;
+float _OrbitSpeedMin;
+float _OrbitSpeedMax;
+
+float _NeighborRadius;
+float _SeparationRadius;
+
+float _PathWeight;
+float _AlignmentWeight;
+float _CohesionWeight;
+float _SeparationWeight;
+
+float _MaxSpeed;
+float _DeltaTime;
+float _TimeValue;
+
+// Optional: make fish follow the sea waves (cheap analytic waves, same style as Sea_shader).
+float _WaveHeight;
+float _WaveSpeed;
+float _WaveScale;
+float _TailPhaseSpeed;
+
+float rand(float n)
+{
+    return frac(sin(n) * 43758.5453);
+}
+
+[numthreads(64, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if (i >= _FishCount)
+        return;
+
+    FishData fish = _FishBuffer[i];
+
+    float3 position = fish.position_phase.xyz;
+    float phase = fish.position_phase.w;
+
+    float3 velocity = fish.velocity_orbit.xyz;
+    float orbitOffset = fish.velocity_orbit.w;
+
+    float heightOffset = fish.extra.x;
+
+    // Movement variables --> randdomly generated
+    float orbitRadius = lerp(_OrbitRadiusMin, _OrbitRadiusMax, rand(orbitOffset * 5.21));
+    float orbitSpeed = lerp(_OrbitSpeedMin, _OrbitSpeedMax, rand(orbitOffset * 9.47));
+
+    // Orbital target path
+    float orbitAngle = _TimeValue * orbitSpeed + orbitOffset;
+
+    float3 target = _FlockCenter + float3(
+        cos(orbitAngle) * orbitRadius,
+        heightOffset,
+        sin(orbitAngle) * orbitRadius
+    );
+
+    float3 desiredDir = normalize(target - position);
+
+    // Boids forces
+    float3 alignment = float3(0, 0, 0);
+    float3 cohesion = float3(0, 0, 0);
+    float3 separation = float3(0, 0, 0);
+
+    int neighborCount = 0;
+
+    for (uint j = 0; j < _FishCount; j++)
+    {
+        if (i == j)
+            continue;
+
+        FishData other = _FishBuffer[j];
+        float3 otherPos = other.position_phase.xyz;
+        float3 otherVel = other.velocity_orbit.xyz;
+
+        float3 diff = otherPos - position;
+        float dist = length(diff);
+
+        if (dist < _NeighborRadius)
+        {
+            alignment += normalize(otherVel);
+            cohesion += otherPos;
+            neighborCount++;
+
+            if (dist < _SeparationRadius)
+            {
+                separation -= diff / max(dist * dist, 0.001);
+            }
+        }
+    }
+
+    if (neighborCount > 0)
+    {
+        alignment = normalize(alignment / neighborCount);
+        cohesion = normalize((cohesion / neighborCount) - position);
+    }
+
+    float3 pathForce = desiredDir;
+
+    float3 force =
+        _PathWeight * pathForce +
+        _AlignmentWeight * alignment +
+        _CohesionWeight * cohesion +
+        _SeparationWeight * separation;
+
+    velocity += force * _DeltaTime;
+
+    // Keep fish moving in horizontal plane
+    velocity.y = 0.0;
+
+    float speed = length(velocity);
+    if (speed > _MaxSpeed)
+    {
+        velocity = normalize(velocity) * _MaxSpeed;
+    }
+
+    if (speed < 0.001)
+    {
+        velocity = desiredDir * (_MaxSpeed * 0.5);
+    }
+
+    position += velocity * _DeltaTime;
+
+    // Follow waves --> keep offset so the flock stays under water
+    float wave =
+        sin(position.x * _WaveScale + _TimeValue * _WaveSpeed) *
+        cos(position.z * _WaveScale + _TimeValue * _WaveSpeed);
+
+    position.y = heightOffset + wave * _WaveHeight;
+
+    phase += _DeltaTime * _TailPhaseSpeed;
+    if (phase > 1000.0) phase = fmod(phase, 6.2831853);
+
+    fish.position_phase = float4(position, phase);
+    fish.velocity_orbit = float4(velocity, orbitOffset);
+    fish.extra = float4(heightOffset, 0, 0, 0);
+
+    _FishBuffer[i] = fish;
+}

@@ -1,0 +1,139 @@
+#pragma kernel CSMain
+
+struct BirdData
+{
+    float4 position_phase; // xyz = position, w = flap phase
+    float4 velocity_orbit; // xyz = velocity, w = orbit offset
+    float4 extra; // x = height offset, yzw unused
+};
+
+RWStructuredBuffer<BirdData> _BirdBuffer;
+
+int _BirdCount;
+float3 _FlockCenter;
+
+float _OrbitRadiusMin;
+float _OrbitRadiusMax;
+float _OrbitSpeedMin;
+float _OrbitSpeedMax;
+
+float _NeighborRadius;
+float _SeparationRadius;
+
+float _PathWeight;
+float _AlignmentWeight;
+float _CohesionWeight;
+float _SeparationWeight;
+
+float _MaxSpeed;
+float _DeltaTime;
+float _TimeValue;
+
+float rand(float n)
+{
+    return frac(sin(n) * 43758.5453);
+}
+
+[numthreads(64, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if (i >= _BirdCount)
+        return;
+
+    BirdData bird = _BirdBuffer[i];
+
+    float3 position = bird.position_phase.xyz;
+    float phase = bird.position_phase.w;
+
+    float3 velocity = bird.velocity_orbit.xyz;
+    float orbitOffset = bird.velocity_orbit.w;
+
+    float heightOffset = bird.extra.x;
+
+    // Movement variables --> randdomly generated
+    float orbitRadius = lerp(_OrbitRadiusMin, _OrbitRadiusMax, rand(orbitOffset * 5.21));
+    float orbitSpeed = lerp(_OrbitSpeedMin, _OrbitSpeedMax, rand(orbitOffset * 9.47));
+
+    // Orbital target path
+    float orbitAngle = _TimeValue * orbitSpeed + orbitOffset;
+
+    float3 target = _FlockCenter + float3(
+        cos(orbitAngle) * orbitRadius,
+        heightOffset,
+        sin(orbitAngle) * orbitRadius
+    );
+
+    float3 desiredDir = normalize(target - position);
+
+    // Boids forces
+    float3 alignment = float3(0, 0, 0);
+    float3 cohesion = float3(0, 0, 0);
+    float3 separation = float3(0, 0, 0);
+
+    int neighborCount = 0;
+
+    for (uint j = 0; j < _BirdCount; j++)
+    {
+        if (i == j)
+            continue;
+
+        BirdData other = _BirdBuffer[j];
+        float3 otherPos = other.position_phase.xyz;
+        float3 otherVel = other.velocity_orbit.xyz;
+
+        float3 diff = otherPos - position;
+        float dist = length(diff);
+
+        if (dist < _NeighborRadius)
+        {
+            alignment += normalize(otherVel);
+            cohesion += otherPos;
+            neighborCount++;
+
+            if (dist < _SeparationRadius)
+            {
+                separation -= diff / max(dist * dist, 0.001);
+            }
+        }
+    }
+
+    if (neighborCount > 0)
+    {
+        alignment = normalize(alignment / neighborCount);
+        cohesion = normalize((cohesion / neighborCount) - position);
+    }
+
+    float3 pathForce = desiredDir;
+
+    float3 force =
+        _PathWeight * pathForce +
+        _AlignmentWeight * alignment +
+        _CohesionWeight * cohesion +
+        _SeparationWeight * separation;
+
+    velocity += force * _DeltaTime;
+
+    // Keep birds moving in horizontal plane
+    velocity.y = 0.0;
+
+    float speed = length(velocity);
+    if (speed > _MaxSpeed)
+    {
+        velocity = normalize(velocity) * _MaxSpeed;
+    }
+
+    if (speed < 0.001)
+    {
+        velocity = desiredDir * (_MaxSpeed * 0.5);
+    }
+
+    position += velocity * _DeltaTime;
+    position.y = heightOffset;
+
+    bird.position_phase = float4(position, phase);
+    bird.velocity_orbit = float4(velocity, orbitOffset);
+    bird.extra = float4(heightOffset, 0, 0, 0);
+
+    _BirdBuffer[i] = bird;
+}
