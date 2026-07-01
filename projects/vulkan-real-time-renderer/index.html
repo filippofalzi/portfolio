@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Vulkan Real-Time Renderer | Filippo Falzi</title>
+
+  <link rel="icon" href="/portfolio/assets/favicon.svg" type="image/svg+xml">
+
+
+  <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    main {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 82px 7%;
+    }
+
+    section {
+      margin-bottom: 96px;
+    }
+
+    .intro {
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 1040px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 7vw, 88px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .intro-text {
+      max-width: 830px;
+      color: var(--ink-soft);
+      font-size: 19px;
+    }
+
+    section > p {
+      max-width: 860px;
+      margin-bottom: 18px;
+      color: var(--stone);
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 40px;
+    }
+
+    .detail-card {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 35px;
+    }
+
+    .image-card {
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 16px 35px rgba(52, 50, 48, 0.06);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .image-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 45px rgba(52, 50, 48, 0.10);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 360px;
+      display: block;
+      object-fit: contain;
+      background: #e7e5e1;
+    }
+
+    .image-content {
+      padding: 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    .image-content p {
+      color: var(--stone);
+      font-size: 15px;
+    }
+
+    .wide-card {
+      grid-column: 1 / -1;
+    }
+
+    .wide-card img {
+      height: auto;
+      max-height: 700px;
+    }
+
+    .highlight {
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
+    }
+
+    .highlight h2 {
+      color: var(--white);
+    }
+
+    .highlight p {
+      max-width: 840px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
+      }
+
+      main {
+        padding-top: 54px;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .wide-card {
+        grid-column: auto;
+      }
+
+      .image-card img {
+        height: auto;
+      }
+
+      .highlight {
+        padding: 28px;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  
+    /* Floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      padding: 9px 12px 9px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      color: rgba(255, 255, 255, 0.92);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        padding: 8px 9px 8px 14px;
+      }
+
+      .site-header .brand {
+        gap: 0;
+      }
+
+      .site-header .brand-name {
+        display: none;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+    }
+
+  
+    /* Final floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 9px 14px 9px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      color: var(--white);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    body.project-page main {
+      padding-top: 126px;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        gap: 8px;
+        padding: 8px 8px 8px 20px;
+      }
+
+      .site-header .brand-name {
+        display: flex;
+        gap: 5px;
+        font-size: 15px;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+        font-size: 11px;
+        letter-spacing: 0.015em;
+      }
+
+      body.project-page main {
+        padding-top: 106px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .site-header {
+        padding-left: 16px;
+      }
+
+      .site-header .brand-name {
+        font-size: 14px;
+      }
+
+      .site-header nav a {
+        padding-inline: 6px;
+        font-size: 10.5px;
+      }
+    }
+
+  
+    /* Brand alignment correction */
+    .site-header {
+      position: fixed;
+      justify-content: flex-end;
+      padding: 9px 14px 9px 30px;
+    }
+
+    .site-header .brand {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+
+    .site-header nav {
+      margin-left: auto;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        position: fixed;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 8px 9px 8px 20px;
+      }
+
+      .site-header .brand {
+        top: 50%;
+        left: 20px;
+        padding: 0;
+      }
+
+      .site-header nav {
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body id="top" class="project-page">
+
+  <header class="site-header">
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="intro">
+      <p class="tag">
+        Real-Time Rendering · Vulkan · PBR · University Project
+      </p>
+
+      <h1>
+        Real-Time Rendering Engine in Vulkan
+      </h1>
+
+      <p class="intro-text">
+        A real-time rendering project developed in Vulkan, progressively
+        extending a deferred renderer with physically based materials,
+        screen-space ambient occlusion, shadow mapping and ray-traced effects.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+          C++, Vulkan, GLSL, deferred rendering
+        </div>
+
+        <div class="detail-card">
+          <strong>Techniques</strong>
+          PBR, SSAO, shadow mapping and ray tracing
+        </div>
+
+        <div class="detail-card">
+          <strong>Role</strong>
+          Rendering pipeline development, shaders and visual testing
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Project overview</h2>
+
+      <p>
+        This project was developed through two consecutive assignments based
+        on the same Vulkan rendering engine.
+      </p>
+
+      <p>
+        The initial deferred renderer was progressively extended with new
+        rendering passes, physically based materials, ambient occlusion,
+        real-time shadows and ray-traced effects.
+      </p>
+
+      <p>
+        The objective was to understand how modern real-time engines organize
+        their rendering pipeline and how different effects interact through
+        the G-Buffer, composition passes and post-processing stages.
+      </p>
+    </section>
+
+    <section>
+      <h2>1. Physically based rendering</h2>
+
+      <p>
+        The original Lambertian material model was extended with a physically
+        based BRDF inspired by the metallic-roughness workflow used in
+        commercial rendering engines.
+      </p>
+
+      <p>
+        The specular response was implemented using the Cook–Torrance
+        microfacet model, with GGX normal distribution, geometric attenuation
+        and Fresnel approximation.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/01_pbr_materials.jpg"
+            alt="Physically based materials with different roughness and metallic values"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>PBR material variations</h3>
+
+            <p>
+              Comparison of different metallic and roughness configurations
+              using the same base geometry.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/02_pbr_gbuffer.jpg"
+            alt="G-Buffer visualization for physically based materials"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>PBR G-Buffer</h3>
+
+            <p>
+              Material identifiers and surface properties are stored in
+              separate G-Buffer attachments for the composition pass.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Deferred rendering and depth pre-pass</h2>
+
+      <p>
+        The engine uses a deferred rendering architecture. Geometry
+        information is written to a G-Buffer before lighting is evaluated in
+        a separate composition stage.
+      </p>
+
+      <p>
+        A depth pre-pass was added to populate the depth buffer before the
+        main geometry pass, allowing hidden fragments to be rejected earlier.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card wide-card">
+          <img
+            src="images/03_bunny_gbuffer.jpg"
+            alt="Deferred rendering G-Buffer for the bunny model"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Deferred rendering pipeline</h3>
+
+            <p>
+              Visualization of the intermediate buffers used to reconstruct
+              the final image during the lighting and composition stages.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Screen-Space Ambient Occlusion</h2>
+
+      <p>
+        Screen-Space Ambient Occlusion was implemented as a separate render
+        pass using depth and normal information from the G-Buffer.
+      </p>
+
+      <p>
+        A hemisphere sampling kernel estimates local occlusion around each
+        visible surface point. The raw result is then blurred before being
+        applied to the final lighting composition.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/04_ssao_raw.jpg"
+            alt="Raw Screen-Space Ambient Occlusion result"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Raw SSAO</h3>
+
+            <p>
+              Initial ambient occlusion map generated from screen-space depth
+              and normal information.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/05_ssao_blurred.jpg"
+            alt="Blurred Screen-Space Ambient Occlusion result"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Blurred SSAO</h3>
+
+            <p>
+              A blur pass reduces sampling noise and produces a smoother
+              occlusion contribution.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card wide-card">
+          <img
+            src="images/06_postprocessing.jpg"
+            alt="Final post-processed image with ambient occlusion"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Final composition</h3>
+
+            <p>
+              The filtered ambient occlusion map is combined with the lighting
+              result during post-processing.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Shadow mapping</h2>
+
+      <p>
+        Real-time shadows were added through shadow mapping. The scene is
+        rendered from the light source to generate a depth map that is later
+        sampled during the lighting pass.
+      </p>
+
+      <p>
+        The implementation was tested with one and multiple lights, requiring
+        separate shadow information for each light source.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/07_shadow_mapping_one_light.jpg"
+            alt="Shadow mapping with one light"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Single-light shadows</h3>
+
+            <p>
+              Depth-based visibility evaluation for a scene illuminated by one
+              shadow-casting light.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/08_shadow_mapping_two_lights.jpg"
+            alt="Shadow mapping with two lights"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Multiple-light shadows</h3>
+
+            <p>
+              Independent shadow contributions generated from two different
+              light sources.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card wide-card">
+          <img
+            src="images/09_shadow_mapping_gbuffer.jpg"
+            alt="Shadow mapping composition and intermediate buffers"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Shadow composition</h3>
+
+            <p>
+              Integration of shadow information with the deferred lighting and
+              composition pipeline.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Ray-traced soft shadows and denoising</h2>
+
+      <p>
+        The final extension introduced ray queries for visibility testing,
+        allowing the renderer to generate softer and more accurate shadows.
+      </p>
+
+      <p>
+        Because ray-traced effects can contain temporal and spatial noise, a
+        denoising stage was applied to stabilize the final result.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/10_ray_traced_shadows_before_denoise.jpg"
+            alt="Noisy ray-traced soft shadows before denoising"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Before denoising</h3>
+
+            <p>
+              Raw ray-traced shadow result containing visible stochastic noise.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/11_ray_traced_shadows_after_denoise.jpg"
+            alt="Ray-traced soft shadows after denoising"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>After denoising</h3>
+
+            <p>
+              The denoising stage reduces variance while preserving the shape
+              and softness of the shadows.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="highlight">
+      <h2>Implementation note</h2>
+
+      <p>
+        This project was developed by extending an educational Vulkan rendering
+        framework. The complete source code is not publicly distributed because
+        part of the base engine and assignment material was provided by the
+        university. This page focuses on the techniques implemented, the
+        rendering pipeline and the resulting visual comparisons.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+</body>
+</html>
