@@ -1,1 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="A Unity action game where a raccoon defends its trash from a giant rat and an army of cockroaches."
+  >
+
+  <title>
+    Raccoon vs. the Rat | Filippo Falzi
+  </title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      color: #151515;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 24px 8%;
+      background: #111;
+      color: white;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 80px 8%;
+    }
+
+    section {
+      margin-bottom: 95px;
+    }
+
+    h1 {
+      max-width: 1000px;
+      margin-bottom: 30px;
+      font-size: clamp(44px, 7vw, 88px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 36px;
+      line-height: 1.15;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    p {
+      max-width: 880px;
+      color: #565656;
+    }
+
+    section > p + p {
+      margin-top: 14px;
+    }
+
+    .intro {
+      margin-bottom: 90px;
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: #777;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .intro-text {
+      max-width: 850px;
+      font-size: 19px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(210px, 1fr)
+      );
+      gap: 20px;
+      margin-top: 42px;
+    }
+
+    .detail-card {
+      padding: 25px;
+      background: white;
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    .video-wrapper {
+      margin-top: 38px;
+      overflow: hidden;
+      background: #111;
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      background: #111;
+    }
+
+    .video-caption {
+      padding: 20px;
+      background: white;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        2,
+        minmax(0, 1fr)
+      );
+      gap: 24px;
+      margin-top: 35px;
+    }
+
+    .feature-card {
+      padding: 28px;
+      background: white;
+    }
+
+    .feature-label {
+      display: block;
+      margin-bottom: 12px;
+      color: #777;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+    }
+
+    .feature-card p {
+      color: #666;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(205px, 1fr)
+      );
+      gap: 18px;
+      margin-top: 35px;
+    }
+
+    .pipeline-step {
+      padding: 24px;
+      background: white;
+    }
+
+    .pipeline-step span {
+      display: block;
+      margin-bottom: 10px;
+      color: #777;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .pipeline-step p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .dark-section {
+      padding: 42px;
+      background: #111;
+      color: white;
+    }
+
+    .dark-section p {
+      color: #ccc;
+    }
+
+    .dark-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        2,
+        minmax(0, 1fr)
+      );
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .dark-card {
+      padding: 25px;
+      border: 1px solid #444;
+    }
+
+    .dark-card span {
+      display: block;
+      margin-bottom: 10px;
+      color: #999;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+    }
+
+    .dark-card p {
+      color: #bbb;
+    }
+
+    .highlight {
+      padding: 36px;
+      background: white;
+      border-left: 5px solid #111;
+    }
+
+    .highlight p {
+      max-width: 880px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      margin-top: 35px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 17px;
+      border: 1px solid #ddd;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .comparison-table th {
+      background: #111;
+      color: white;
+    }
+
+    .comparison-table td {
+      color: #555;
+    }
+
+    .code-section {
+      padding: 40px;
+      background: #111;
+      color: white;
+    }
+
+    .code-section > p {
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(245px, 1fr)
+      );
+      gap: 16px;
+    }
+
+    .code-card {
+      display: block;
+      padding: 22px;
+      border: 1px solid #444;
+      color: white;
+      text-decoration: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .code-card:hover {
+      background: #222;
+      border-color: #888;
+    }
+
+    .code-card strong {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .code-card span {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 25px;
+      padding: 22px;
+      background: #ededed;
+      color: #555;
+      font-size: 15px;
+    }
+
+    footer {
+      padding: 30px 8%;
+      background: #111;
+      color: #aaa;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      main {
+        padding-top: 50px;
+      }
+
+      .feature-grid,
+      .dark-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dark-section,
+      .code-section {
+        padding: 28px;
+      }
+
+      .comparison-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <a href="../../index.html">
+      <strong>FILIPPO FALZI</strong>
+    </a>
+
+    <a href="../../index.html">
+      Back to portfolio
+    </a>
+  </header>
+
+  <main>
+
+    <section class="intro">
+
+      <p class="tag">
+        Game Development · Unity · C# · Gameplay Systems
+      </p>
+
+      <h1>
+        Raccoon vs. the Rat
+      </h1>
+
+      <p class="intro-text">
+        A dark-fantasy arena game where a raccoon defends its
+        trash from a giant rat and an invading army of cockroaches.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Engine</strong>
+
+          Unity and C#
+        </div>
+
+        <div class="detail-card">
+          <strong>Genre</strong>
+
+          Third-person action and arena defence
+        </div>
+
+        <div class="detail-card">
+          <strong>Main systems</strong>
+
+          Combat, AI, animation, pooling and game-state management
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>Project overview</h2>
+
+      <p>
+        The player controls a raccoon defending a trash container
+        inside a dark arena inspired by Mordor.
+      </p>
+
+      <p>
+        A giant rat moves laterally across the battlefield and
+        repeatedly releases cockroaches that advance towards the
+        player's trash.
+      </p>
+
+      <p>
+        The raccoon can move, run and fire projectiles while trying
+        to stop the incoming enemies and defeat the rat boss.
+      </p>
+
+      <div class="video-wrapper">
+
+        <video
+          controls
+          preload="metadata"
+        >
+
+          <source
+            src="video/raccoon_vs_rat_demo.mp4"
+            type="video/mp4"
+          >
+
+          Your browser does not support the video element.
+
+        </video>
+
+        <div class="video-caption">
+          Gameplay demonstration showing combat, cockroach waves,
+          the Ring ability and the final victory and defeat states.
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>1. Core gameplay loop</h2>
+
+      <p>
+        The game is structured around a continuous defence loop.
+        The boss generates enemies, the player intercepts them and
+        the arena becomes increasingly difficult to control.
+      </p>
+
+      <div class="pipeline">
+
+        <article class="pipeline-step">
+
+          <span>STEP 01</span>
+
+          <h3>Rat movement</h3>
+
+          <p>
+            The boss patrols laterally, changes direction and
+            occasionally pauses its movement.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 02</span>
+
+          <h3>Enemy spawning</h3>
+
+          <p>
+            Cockroaches are taken from a reusable pool and released
+            into the arena.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 03</span>
+
+          <h3>Player defence</h3>
+
+          <p>
+            The raccoon moves around the arena and fires projectiles
+            at the boss and its minions.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 04</span>
+
+          <h3>Win or lose</h3>
+
+          <p>
+            The game ends when either the rat or the raccoon reaches
+            zero health.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>2. Player movement and combat</h2>
+
+      <p>
+        Player input is handled through Unity's Input System.
+        The raccoon supports directional movement, running and
+        ranged attacks.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            MOVEMENT
+          </span>
+
+          <h3>Third-person controls</h3>
+
+          <p>
+            The character moves inside a limited arena using a
+            CharacterController and separate walking and running
+            speeds.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            ATTACK
+          </span>
+
+          <h3>Fireball projectiles</h3>
+
+          <p>
+            The raccoon launches fireballs from a dedicated firing
+            point towards the enemy target.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            DAMAGE
+          </span>
+
+          <h3>Health and reaction</h3>
+
+          <p>
+            Damage updates the player's health, triggers a reaction
+            animation and activates a short invulnerability window.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            ARENA CONTROL
+          </span>
+
+          <h3>Movement boundaries</h3>
+
+          <p>
+            The player is constrained to the playable area to keep
+            the combat inside the intended arena.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>3. Rat boss behaviour</h2>
+
+      <p>
+        The giant rat acts as the central boss and coordinates the
+        pressure applied to the player.
+      </p>
+
+      <p>
+        It moves from side to side, changes direction, pauses at
+        irregular intervals and generates new cockroaches during
+        combat.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            MOVEMENT
+          </span>
+
+          <h3>Lateral patrol</h3>
+
+          <p>
+            The rat travels between two limits and rotates its model
+            according to its current movement direction.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            SPAWNING
+          </span>
+
+          <h3>Cockroach waves</h3>
+
+          <p>
+            Enemies are requested from the pool at regular intervals
+            and released from a dedicated spawn point.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            ANIMATION
+          </span>
+
+          <h3>Dance, damage and death</h3>
+
+          <p>
+            The boss includes an introductory dance, movement,
+            damage reaction and death animation.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            BOSS HEALTH
+          </span>
+
+          <h3>Victory condition</h3>
+
+          <p>
+            Fireballs reduce the rat's health. Reaching zero health
+            triggers the game's victory state.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>4. Cockroach enemy system</h2>
+
+      <p>
+        Cockroaches form the secondary enemy type. They move in a
+        fixed direction towards the player's trash and damage the
+        raccoon when they reach their target area.
+      </p>
+
+      <p>
+        Instead of being continuously instantiated and destroyed,
+        they are managed through a queue-based object pool.
+      </p>
+
+      <div class="dark-section">
+
+        <h3>Object pooling cycle</h3>
+
+        <div class="dark-grid">
+
+          <article class="dark-card">
+
+            <span>INITIALISATION</span>
+
+            <h3>Pre-created enemies</h3>
+
+            <p>
+              A fixed number of cockroaches is instantiated when the
+              game begins and stored as inactive objects.
+            </p>
+
+          </article>
+
+          <article class="dark-card">
+
+            <span>SPAWN</span>
+
+            <h3>Reuse from queue</h3>
+
+            <p>
+              The rat obtains the next available enemy from the pool
+              instead of creating a new instance.
+            </p>
+
+          </article>
+
+          <article class="dark-card">
+
+            <span>GAMEPLAY</span>
+
+            <h3>Movement and damage</h3>
+
+            <p>
+              Active enemies move towards the target, receive damage
+              and trigger player damage when reaching the defence zone.
+            </p>
+
+          </article>
+
+          <article class="dark-card">
+
+            <span>RETURN</span>
+
+            <h3>Recycle instance</h3>
+
+            <p>
+              Dead, expired or successful cockroaches are disabled
+              and returned to the pool for later reuse.
+            </p>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>5. The Ring ability</h2>
+
+      <p>
+        The raccoon has access to an additional ability inspired by
+        the One Ring.
+      </p>
+
+      <p>
+        When activated, the character becomes temporarily invisible
+        and invulnerable. The player can continue attacking while the
+        rat pauses the generation of new cockroaches.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            VISIBILITY
+          </span>
+
+          <h3>Temporary invisibility</h3>
+
+          <p>
+            The raccoon model disappears while the ability remains
+            active.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            DEFENCE
+          </span>
+
+          <h3>Invulnerability</h3>
+
+          <p>
+            Incoming damage is ignored during the active ability
+            window.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            OFFENCE
+          </span>
+
+          <h3>Continued attacks</h3>
+
+          <p>
+            The player can still fire projectiles while hidden.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            ENEMY RESPONSE
+          </span>
+
+          <h3>Spawn interruption</h3>
+
+          <p>
+            The rat temporarily stops releasing new cockroaches.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>6. Animation system</h2>
+
+      <p>
+        Multiple animated elements are coordinated through Unity's
+        Animator system.
+      </p>
+
+      <p>
+        The raccoon uses a Blend Tree for locomotion and a separate
+        Animation Layer for damage reactions.
+      </p>
+
+      <table class="comparison-table">
+
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Animation behaviour</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>Raccoon</td>
+
+            <td>
+              Idle, walking, running and damage reactions using a
+              Blend Tree and Animation Layer.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Giant rat</td>
+
+            <td>
+              Introductory dance, lateral movement, damage and death.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Cockroaches</td>
+
+            <td>
+              Continuous locomotion while advancing towards the target.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Tower eye</td>
+
+            <td>
+              Search movement during gameplay and target tracking
+              during defeat.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Ring</td>
+
+            <td>
+              Appearance, rotation, movement and scale reduction.
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+    <section>
+
+      <h2>7. Game architecture</h2>
+
+      <p>
+        The project applies several common game-development patterns
+        to separate responsibilities and reduce unnecessary runtime
+        allocation.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            SINGLETON
+          </span>
+
+          <h3>GameManager</h3>
+
+          <p>
+            Centralises the global game state, victory, defeat and
+            scene restart.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            OBSERVER
+          </span>
+
+          <h3>Subject and Observer</h3>
+
+          <p>
+            Gameplay events are communicated without tightly coupling
+            the sender to the receiving systems.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            DATA POOLING
+          </span>
+
+          <h3>Cockroach pool</h3>
+
+          <p>
+            Enemies are reused through a queue instead of repeatedly
+            creating and destroying GameObjects.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            LEVEL OF DETAIL
+          </span>
+
+          <h3>Tower LOD</h3>
+
+          <p>
+            The distant tower switches to a simplified silhouette
+            while keeping the eye and lighting effects active.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>8. Visual and audio presentation</h2>
+
+      <p>
+        The scene combines a dark-fantasy art direction with custom
+        lighting, music, camera work and gameplay feedback.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            CINEMACHINE
+          </span>
+
+          <h3>Camera introduction</h3>
+
+          <p>
+            The game begins with an introductory camera movement
+            before switching to the gameplay camera.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            SHADER GRAPH
+          </span>
+
+          <h3>Tower light cone</h3>
+
+          <p>
+            A custom animated material combines noise, transparency
+            and red-orange colour variation.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            PARTICLE POOL
+          </span>
+
+          <h3>Impact effects</h3>
+
+          <p>
+            Particle systems are reused for fireball impacts against
+            cockroaches.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            AUDIO
+          </span>
+
+          <h3>Music and sound effects</h3>
+
+          <p>
+            A persistent AudioManager controls looping music and
+            tagged gameplay sound effects.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>9. Victory and defeat</h2>
+
+      <p>
+        The game has two clear final states.
+      </p>
+
+      <p>
+        Defeating the giant rat triggers victory. Losing all raccoon
+        health triggers defeat, after which the tower eye locks onto
+        the player and attacks with its cone of light.
+      </p>
+
+      <div class="dark-section">
+
+        <div class="dark-grid">
+
+          <article class="dark-card">
+
+            <span>VICTORY</span>
+
+            <h3>Boss defeated</h3>
+
+            <p>
+              The rat's death notifies the game-state system and
+              activates the final victory interface.
+            </p>
+
+          </article>
+
+          <article class="dark-card">
+
+            <span>DEFEAT</span>
+
+            <h3>The eye strikes</h3>
+
+            <p>
+              The tower stops searching, aims directly at the raccoon
+              and intensifies its light cone during the defeat sequence.
+            </p>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="highlight">
+
+      <h2>Technical value</h2>
+
+      <p>
+        This project combines player control, ranged combat, enemy
+        behaviour, animation systems, pooling, event-driven
+        architecture, LOD, Shader Graph, particles, audio and
+        complete win-and-lose gameplay states inside a single Unity
+        project.
+      </p>
+
+    </section>
+
+    <section class="code-section">
+
+      <h2>Source code</h2>
+
+      <p>
+        The files below preserve the original filenames used in the
+        Unity project.
+      </p>
+
+      <div class="code-grid">
+
+        <a
+          class="code-card"
+          href="code/RacoonHero.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>RacoonHero.cs</strong>
+
+          <span>
+            Player movement, health, combat, animations and Ring ability
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/EvilRat.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>EvilRat.cs</strong>
+
+          <span>
+            Boss movement, spawning, damage and death behaviour
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/CockRoach.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>CockRoach.cs</strong>
+
+          <span>
+            Cockroach movement, damage, lifetime and pool return
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/CR_Pool.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>CR_Pool.cs</strong>
+
+          <span>
+            Queue-based cockroach object pooling
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/FireBall.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>FireBall.cs</strong>
+
+          <span>
+            Projectile movement, collision and enemy damage
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/GameManager.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>GameManager.cs</strong>
+
+          <span>
+            Global game state, victory, defeat and restart
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/Subject.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>Subject.cs</strong>
+
+          <span>
+            Generic event subject implementation
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/Observer.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>Observer.cs</strong>
+
+          <span>
+            Observer interface used by gameplay systems
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/ArenaLimits.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>ArenaLimits.cs</strong>
+
+          <span>
+            Player boundary enforcement inside the combat area
+          </span>
+        </a>
+
+        <a
+          class="code-card"
+          href="code/AudioManager.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>AudioManager.cs</strong>
+
+          <span>
+            Persistent music and tagged sound-effect management
+          </span>
+        </a>
+
+      </div>
+
+      <div class="note">
+        The original filenames CockRoach.cs, CR_Pool.cs,
+        FireBall.cs and RacoonHero.cs have been preserved exactly
+        as they appear in the Unity project.
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 Filippo Falzi
+  </footer>
+
+</body>
+
+</html>
