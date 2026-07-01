@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Finite Element Elasticity | Filippo Falzi</title>
+
+  <link rel="icon" href="/portfolio/assets/favicon.svg" type="image/svg+xml">
+
+
+  <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    main {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 82px 7%;
+    }
+
+    section {
+      margin-bottom: 96px;
+    }
+
+    h1 {
+      max-width: 1050px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 7vw, 88px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    section > p {
+      max-width: 860px;
+      margin-bottom: 18px;
+      color: var(--stone);
+    }
+
+    .intro {
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .intro-text {
+      max-width: 830px;
+      color: var(--ink-soft);
+      font-size: 19px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 40px;
+    }
+
+    .detail-card,
+    .feature-card,
+    .pipeline-step {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .video-wrapper {
+      margin-top: 36px;
+      overflow: hidden;
+      background: var(--ink);
+      box-shadow: 0 24px 55px rgba(52, 50, 48, 0.12);
+    }
+
+    video {
+      width: 100%;
+      max-height: 720px;
+      display: block;
+      background: var(--ink);
+    }
+
+    .video-caption {
+      padding: 20px;
+      background: var(--card);
+      color: var(--stone);
+      border-top: 1px solid var(--line);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 34px;
+    }
+
+    .feature-label {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.09em;
+    }
+
+    .feature-card p {
+      color: var(--stone);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+      margin-top: 35px;
+    }
+
+    .pipeline-step span {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .pipeline-step p {
+      color: var(--stone);
+      font-size: 15px;
+    }
+
+    .equation-box {
+      margin-top: 35px;
+      padding: 34px;
+      background: var(--ink);
+      color: var(--white);
+      border-left: 6px solid var(--blue);
+    }
+
+    .equation-box p {
+      max-width: 850px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .equation {
+      margin: 20px 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--white);
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .comparison-table {
+      width: 100%;
+      margin-top: 35px;
+      border-collapse: collapse;
+      background: var(--card);
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 17px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .comparison-table th {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .comparison-table td {
+      color: var(--stone);
+    }
+
+    .highlight {
+      padding: 36px;
+      background: var(--card);
+      border-left: 6px solid var(--blue);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .highlight p {
+      max-width: 860px;
+      color: var(--stone);
+    }
+
+    .code-section {
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
+    }
+
+    .code-section > p {
+      max-width: 850px;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .code-card {
+      display: block;
+      max-width: 560px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
+      text-decoration: none;
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .code-card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--mist);
+    }
+
+    .code-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .code-card span {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 14px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
+      }
+
+      main {
+        padding-top: 54px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .code-section {
+        padding: 28px;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  
+    /* Floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      padding: 9px 12px 9px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      color: rgba(255, 255, 255, 0.92);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        padding: 8px 9px 8px 14px;
+      }
+
+      .site-header .brand {
+        gap: 0;
+      }
+
+      .site-header .brand-name {
+        display: none;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+    }
+
+  
+    /* Final floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 9px 14px 9px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      color: var(--white);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    body.project-page main {
+      padding-top: 126px;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        gap: 8px;
+        padding: 8px 8px 8px 20px;
+      }
+
+      .site-header .brand-name {
+        display: flex;
+        gap: 5px;
+        font-size: 15px;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+        font-size: 11px;
+        letter-spacing: 0.015em;
+      }
+
+      body.project-page main {
+        padding-top: 106px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .site-header {
+        padding-left: 16px;
+      }
+
+      .site-header .brand-name {
+        font-size: 14px;
+      }
+
+      .site-header nav a {
+        padding-inline: 6px;
+        font-size: 10.5px;
+      }
+    }
+
+  
+    /* Brand alignment correction */
+    .site-header {
+      position: fixed;
+      justify-content: flex-end;
+      padding: 9px 14px 9px 30px;
+    }
+
+    .site-header .brand {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+
+    .site-header nav {
+      margin-left: auto;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        position: fixed;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 8px 9px 8px 20px;
+      }
+
+      .site-header .brand {
+        top: 50%;
+        left: 20px;
+        padding: 0;
+      }
+
+      .site-header nav {
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body id="top" class="project-page">
+
+  <header class="site-header">
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="intro">
+      <p class="tag">
+        Physics Simulation · Unity · C# · Finite Element Method
+      </p>
+
+      <h1>
+        Co-Rotational Finite Element Elasticity
+      </h1>
+
+      <p class="intro-text">
+        A deformable-solid simulation developed in Unity using tetrahedral
+        finite elements, linear elasticity, co-rotational deformation and
+        implicit numerical integration.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+          Unity, C#, Math.NET Numerics
+        </div>
+
+        <div class="detail-card">
+          <strong>Simulation model</strong>
+          Tetrahedral FEM and continuum elasticity
+        </div>
+
+        <div class="detail-card">
+          <strong>Numerical methods</strong>
+          Symplectic Euler, implicit Euler and sparse matrices
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Project overview</h2>
+
+      <p>
+        This project implements a three-dimensional elastic body using the
+        Finite Element Method. The object is discretized into tetrahedral
+        elements, each of which contributes elastic forces and stiffness terms
+        to the global simulation system.
+      </p>
+
+      <p>
+        Unlike a mass-spring model, the FEM formulation represents the
+        deformation of the complete material volume. The simulation therefore
+        evaluates deformation, strain and elastic response inside every
+        tetrahedron.
+      </p>
+
+      <div class="video-wrapper">
+        <video controls preload="metadata">
+          <source
+            src="video/fem_elasticity_demo.mp4"
+            type="video/mp4"
+          >
+
+          Your browser does not support the video element.
+        </video>
+
+        <div class="video-caption">
+          Implicit FEM simulation showing a tetrahedral beam deforming under
+          load while preserving stable elastic behaviour.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>1. Tetrahedral finite element model</h2>
+
+      <p>
+        The simulated body is divided into tetrahedral elements. Each element
+        contains four nodes with positions in the undeformed and deformed
+        configurations.
+      </p>
+
+      <p>
+        Local tetrahedral contributions are calculated independently and later
+        assembled into the global force vector and stiffness matrix.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+          <span class="feature-label">REST CONFIGURATION</span>
+
+          <h3>Undeformed geometry</h3>
+
+          <p>
+            Each tetrahedron stores the original node positions used to define
+            its reference shape and initial volume.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-label">WORLD CONFIGURATION</span>
+
+          <h3>Deformed geometry</h3>
+
+          <p>
+            The current node positions describe how each tetrahedral element
+            has moved, stretched, compressed or rotated.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-label">LOCAL COMPUTATION</span>
+
+          <h3>Element forces</h3>
+
+          <p>
+            Every element calculates an elastic force contribution for each of
+            its four nodes.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-label">GLOBAL ASSEMBLY</span>
+
+          <h3>Complete deformable body</h3>
+
+          <p>
+            Local element vectors and matrices are accumulated into the global
+            simulation system.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Deformation gradient</h2>
+
+      <p>
+        The deformation gradient describes the transformation from the
+        undeformed tetrahedron to its current configuration.
+      </p>
+
+      <p>
+        It contains information about stretching, compression, shear and
+        rotation inside the element.
+      </p>
+
+      <div class="equation-box">
+        <h3>Element deformation</h3>
+
+        <div class="equation">
+          F = Ds · Dm⁻¹
+        </div>
+
+        <p>
+          Dm represents the tetrahedron in its rest configuration, while Ds
+          represents its current deformed configuration.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Strain and linear elasticity</h2>
+
+      <p>
+        Strain measures the actual shape deformation of the material. In the
+        linear formulation, the Cauchy strain tensor is calculated from the
+        deformation gradient.
+      </p>
+
+      <div class="equation-box">
+        <h3>Linear strain</h3>
+
+        <div class="equation">
+          ε = 1/2 (F + Fᵀ) - I
+        </div>
+
+        <p>
+          The resulting strain is converted into stress according to the
+          selected elastic material parameters.
+        </p>
+      </div>
+
+      <div class="pipeline">
+
+        <article class="pipeline-step">
+          <span>STEP 01</span>
+
+          <h3>Node matrix</h3>
+
+          <p>
+            Current tetrahedron positions are collected into a local matrix.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 02</span>
+
+          <h3>Deformation gradient</h3>
+
+          <p>
+            The rest and deformed tetrahedra are compared through the gradient
+            matrix.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 03</span>
+
+          <h3>Strain</h3>
+
+          <p>
+            Local material deformation is measured from the gradient.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 04</span>
+
+          <h3>Elastic stress</h3>
+
+          <p>
+            The material model converts strain into an internal stress.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 05</span>
+
+          <h3>Nodal forces</h3>
+
+          <p>
+            Stress is converted into forces acting on the tetrahedron nodes.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Co-rotational elasticity</h2>
+
+      <p>
+        A purely linear model incorrectly treats large rigid rotations as
+        material deformation.
+      </p>
+
+      <p>
+        The co-rotational formulation separates the rotational component from
+        the actual elastic deformation. The material can therefore rotate
+        while maintaining a physically meaningful strain measurement.
+      </p>
+
+      <div class="equation-box">
+        <h3>Rotation extraction</h3>
+
+        <div class="equation">
+          F = R · S
+        </div>
+
+        <div class="equation">
+          Fcorotated = Rᵀ · F
+        </div>
+
+        <p>
+          R represents the rigid rotation, while the remaining component
+          contains the elastic deformation used to calculate strain and force.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Force Jacobian</h2>
+
+      <p>
+        The derivative of the elastic force with respect to node positions
+        forms the local force Jacobian.
+      </p>
+
+      <p>
+        This matrix describes how forces change when the tetrahedral nodes
+        move. It is required by the implicit solver and contributes to the
+        global stiffness matrix.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+          <span class="feature-label">LOCAL MATRIX</span>
+
+          <h3>Tetrahedral stiffness</h3>
+
+          <p>
+            Each tetrahedron produces a local matrix relating node
+            displacement to elastic force variation.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-label">GLOBAL SYSTEM</span>
+
+          <h3>Sparse assembly</h3>
+
+          <p>
+            Local Jacobians are inserted into a sparse global matrix using the
+            indices of the tetrahedron nodes.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>6. Symplectic and implicit integration</h2>
+
+      <p>
+        The simulator supports both symplectic and implicit integration.
+        Symplectic Euler is simpler and less expensive, but it may become
+        unstable for stiff materials or large time steps.
+      </p>
+
+      <p>
+        Implicit Euler includes the force Jacobian in the update system,
+        providing greater stability for elastic solids.
+      </p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Main characteristic</th>
+            <th>Typical behaviour</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Symplectic Euler</td>
+
+            <td>
+              Uses current forces to update velocity before updating position.
+            </td>
+
+            <td>
+              Efficient, but sensitive to stiffness and time-step size.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Implicit Euler</td>
+
+            <td>
+              Solves a linear system containing the force Jacobian.
+            </td>
+
+            <td>
+              More computationally expensive, but significantly more stable.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="equation-box">
+        <h3>Implicit update</h3>
+
+        <div class="equation">
+          A = M - h² (dF/dx)
+        </div>
+
+        <div class="equation">
+          b = Mvₙ + hF
+        </div>
+
+        <div class="equation">
+          Avₙ₊₁ = b
+        </div>
+
+        <p>
+          M is the mass matrix, h is the time step, F is the global force
+          vector and dF/dx is the assembled force Jacobian.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>7. Sparse matrix assembly</h2>
+
+      <p>
+        Every tetrahedron affects only the degrees of freedom of its four
+        nodes. The resulting global Jacobian is therefore sparse.
+      </p>
+
+      <p>
+        Instead of storing a complete dense matrix, the implementation adds
+        only the non-zero local contributions using sparse matrix triplets.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+          <span class="feature-label">MEMORY</span>
+
+          <h3>Sparse storage</h3>
+
+          <p>
+            Only non-zero matrix coefficients are stored, reducing memory
+            consumption.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-label">PERFORMANCE</span>
+
+          <h3>Efficient assembly</h3>
+
+          <p>
+            Each tetrahedron contributes a small local block to the global
+            system.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="highlight">
+      <h2>Technical progression</h2>
+
+      <p>
+        This project extends deformable-body simulation from discrete
+        mass-spring models to continuum mechanics. The final implementation
+        combines tetrahedral discretization, deformation gradients, strain,
+        co-rotational elasticity, force Jacobians and sparse implicit
+        integration.
+      </p>
+    </section>
+
+    <section class="code-section">
+      <h2>Source code</h2>
+
+      <p>
+        The main source file contains the tetrahedral element implementation,
+        including deformation, strain, elastic forces, co-rotational handling
+        and force Jacobians.
+      </p>
+
+      <a
+        class="code-card"
+        href="code/Tetrahedron.cs"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <strong>Tetrahedron.cs</strong>
+
+        <span>
+          Tetrahedral FEM forces, strain, co-rotational elasticity and Jacobians
+        </span>
+      </a>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+</body>
+</html>
