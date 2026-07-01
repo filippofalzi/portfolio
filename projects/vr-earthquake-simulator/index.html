@@ -1,1 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Interactive VR earthquake simulator developed in Unity using Meta XR, controller velocity input and physics-based interaction."
+  >
+
+  <title>
+    VR Earthquake Simulator | Filippo Falzi
+  </title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      color: #151515;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 24px 8%;
+      background: #111;
+      color: white;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 80px 8%;
+    }
+
+    section {
+      margin-bottom: 95px;
+    }
+
+    h1 {
+      max-width: 1050px;
+      margin-bottom: 30px;
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 36px;
+      line-height: 1.15;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    p {
+      max-width: 880px;
+      color: #565656;
+    }
+
+    .intro {
+      margin-bottom: 90px;
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: #777;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .intro-text {
+      max-width: 850px;
+      font-size: 19px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(210px, 1fr)
+      );
+      gap: 20px;
+      margin-top: 42px;
+    }
+
+    .detail-card {
+      padding: 25px;
+      background: white;
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    .video-wrapper {
+      margin-top: 38px;
+      overflow: hidden;
+      background: #111;
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      background: #111;
+    }
+
+    .video-caption {
+      padding: 20px;
+      background: white;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        2,
+        minmax(0, 1fr)
+      );
+      gap: 24px;
+      margin-top: 35px;
+    }
+
+    .feature-card {
+      padding: 28px;
+      background: white;
+    }
+
+    .feature-label {
+      display: block;
+      margin-bottom: 12px;
+      color: #777;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+    }
+
+    .feature-card p {
+      color: #666;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(210px, 1fr)
+      );
+      gap: 18px;
+      margin-top: 35px;
+    }
+
+    .pipeline-step {
+      padding: 24px;
+      background: white;
+    }
+
+    .pipeline-step span {
+      display: block;
+      margin-bottom: 10px;
+      color: #777;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .pipeline-step p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .equation-box {
+      margin-top: 35px;
+      padding: 35px;
+      background: #111;
+      color: white;
+    }
+
+    .equation-box p {
+      color: #ccc;
+    }
+
+    .equation {
+      margin: 20px 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: #1d1d1d;
+      color: white;
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+    }
+
+    .highlight {
+      padding: 36px;
+      background: white;
+      border-left: 5px solid #111;
+    }
+
+    .highlight p {
+      max-width: 880px;
+    }
+
+    .code-section {
+      padding: 40px;
+      background: #111;
+      color: white;
+    }
+
+    .code-section > p {
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(250px, 1fr)
+      );
+      gap: 16px;
+    }
+
+    .code-card {
+      display: block;
+      padding: 22px;
+      border: 1px solid #444;
+      color: white;
+      text-decoration: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .code-card:hover {
+      background: #222;
+      border-color: #888;
+    }
+
+    .code-card strong {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .code-card span {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 25px;
+      padding: 22px;
+      background: #ededed;
+      color: #555;
+      font-size: 15px;
+    }
+
+    footer {
+      padding: 30px 8%;
+      background: #111;
+      color: #aaa;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      main {
+        padding-top: 50px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .code-section {
+        padding: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <a href="../../index.html">
+      <strong>FILIPPO FALZI</strong>
+    </a>
+
+    <a href="../../index.html">
+      Back to portfolio
+    </a>
+  </header>
+
+  <main>
+
+    <section class="intro">
+
+      <p class="tag">
+        Virtual Reality · Unity · Meta XR · Interactive Physics
+      </p>
+
+      <h1>
+        Interactive VR Earthquake Simulator
+      </h1>
+
+      <p class="intro-text">
+        A virtual reality prototype in which the physical movement
+        of an Oculus controller generates a simulated earthquake
+        inside an interactive room.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+
+          Unity, C#, Meta XR SDK and XR Interaction Toolkit
+        </div>
+
+        <div class="detail-card">
+          <strong>Interaction</strong>
+
+          Controller velocity, grip input and haptic feedback
+        </div>
+
+        <div class="detail-card">
+          <strong>Simulation</strong>
+
+          Spring-damper dynamics and rigid body response
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>Project overview</h2>
+
+      <p>
+        The project explores how movement captured by a virtual
+        reality controller can be converted into a dynamic physical
+        event.
+      </p>
+
+      <p>
+        When the user grabs and shakes the controller, its velocity
+        is measured and transformed into an external force applied
+        to the virtual room.
+      </p>
+
+      <p>
+        The room oscillates according to a spring-damper model,
+        while furniture and loose objects respond through Unity
+        rigid body physics.
+      </p>
+
+      <div class="video-wrapper">
+
+        <video
+          controls
+          preload="metadata"
+          poster="images/vr_earthquake_demo_poster.jpg"
+        >
+
+          <source
+            src="video/vr_earthquake_demo.mp4"
+            type="video/mp4"
+          >
+
+          Your browser does not support the video element.
+
+        </video>
+
+        <div class="video-caption">
+          Interactive demonstration showing the controller input,
+          room vibration, object response and Richter-scale feedback.
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>1. XR controller interaction</h2>
+
+      <p>
+        The interaction begins when the user grabs the virtual
+        Oculus controller using the grip input.
+      </p>
+
+      <p>
+        The controller is configured as an XR Grab Interactable,
+        allowing the user to pick it up, hold it and move it naturally
+        inside the scene.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            GRAB INTERACTION
+          </span>
+
+          <h3>XR Grab Interactable</h3>
+
+          <p>
+            The controller can be selected and held using the
+            standard XR Interaction Toolkit workflow.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            HAND ANIMATION
+          </span>
+
+          <h3>Grip and trigger input</h3>
+
+          <p>
+            Grip and trigger values are connected to the hand
+            animator to reproduce the movement of the virtual fingers.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            ATTACHMENT
+          </span>
+
+          <h3>Relative hand alignment</h3>
+
+          <p>
+            A dedicated attach transform aligns the virtual hand
+            with the controller to improve the apparent grip position.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            VISUAL FEEDBACK
+          </span>
+
+          <h3>Interaction state</h3>
+
+          <p>
+            Interactive elements change appearance to provide
+            immediate visual feedback during hover and selection.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>2. Controller velocity input</h2>
+
+      <p>
+        The physical controller velocity is read from an Input Action
+        configured as a Vector3 value.
+      </p>
+
+      <p>
+        When a physical controller is not available, the XR Simulator
+        uses the difference between consecutive controller positions
+        to estimate velocity.
+      </p>
+
+      <div class="equation-box">
+
+        <h3>Simulator fallback</h3>
+
+        <div class="equation">
+          handVelocity =
+          (currentPosition - previousPosition) / deltaTime
+        </div>
+
+        <p>
+          This fallback makes it possible to test the complete
+          interaction using mouse and keyboard input inside the
+          Unity editor.
+        </p>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>3. Earthquake dynamics</h2>
+
+      <p>
+        The room is modelled as a forced and damped oscillator.
+        Controller velocity produces the external force that moves
+        the system away from its equilibrium position.
+      </p>
+
+      <div class="equation-box">
+
+        <h3>Spring-damper model</h3>
+
+        <div class="equation">
+          m · x'' + c · x' + k · x = F(t)
+        </div>
+
+        <p>
+          The stiffness term restores the room towards its original
+          position, while damping dissipates energy and gradually
+          stops the oscillation.
+        </p>
+
+      </div>
+
+      <div class="pipeline">
+
+        <article class="pipeline-step">
+
+          <span>STEP 01</span>
+
+          <h3>Read velocity</h3>
+
+          <p>
+            Controller movement is captured as a three-dimensional
+            velocity vector.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 02</span>
+
+          <h3>Generate force</h3>
+
+          <p>
+            The velocity is multiplied by an intensity factor to
+            obtain the external seismic force.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 03</span>
+
+          <h3>Integrate motion</h3>
+
+          <p>
+            Acceleration, velocity and displacement are updated
+            numerically every frame.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 04</span>
+
+          <h3>Move the room</h3>
+
+          <p>
+            The final displacement is applied to the complete room
+            container.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>4. Physical object response</h2>
+
+      <p>
+        Furniture and loose objects inside the room use Unity
+        Rigidbody components.
+      </p>
+
+      <p>
+        As the room moves, objects vibrate, slide and fall according
+        to the simulated acceleration and collision response.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            RIGID BODY PHYSICS
+          </span>
+
+          <h3>Dynamic furniture</h3>
+
+          <p>
+            Objects react independently to the movement of the room
+            through mass, gravity and collisions.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            COLLISION DETECTION
+          </span>
+
+          <h3>Continuous collisions</h3>
+
+          <p>
+            Continuous collision detection helps prevent fast-moving
+            objects from passing through the floor.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            INTERPOLATION
+          </span>
+
+          <h3>Smoother movement</h3>
+
+          <p>
+            Rigidbody interpolation reduces visible differences
+            between the physics update and the headset refresh rate.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            REAL-TIME RESPONSE
+          </span>
+
+          <h3>No prerecorded animation</h3>
+
+          <p>
+            The final motion depends directly on controller input
+            and the physical configuration of the scene.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>5. Multisensory feedback</h2>
+
+      <p>
+        The project combines visual, auditory and haptic feedback
+        to communicate earthquake intensity.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            USER INTERFACE
+          </span>
+
+          <h3>Richter-scale display</h3>
+
+          <p>
+            A screen-space interface displays a smoothed intensity
+            value that changes colour at high magnitudes.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            LIGHTING
+          </span>
+
+          <h3>Dynamic flickering</h3>
+
+          <p>
+            Ceiling-light intensity changes in proportion to the
+            seismic input.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            SPATIAL AUDIO
+          </span>
+
+          <h3>Earthquake rumble</h3>
+
+          <p>
+            Volume is modulated in real time according to the
+            intensity of the controller movement.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            HAPTICS
+          </span>
+
+          <h3>Controller vibration</h3>
+
+          <p>
+            Haptic impulses are generated when the measured
+            earthquake intensity exceeds a threshold.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>6. VR comfort vignette</h2>
+
+      <p>
+        Rapid movement of the room can increase discomfort in
+        virtual reality.
+      </p>
+
+      <p>
+        To reduce this effect, a custom vignette progressively
+        narrows the visible field of view when the simulated
+        earthquake becomes stronger.
+      </p>
+
+      <div class="equation-box">
+
+        <h3>Dynamic aperture</h3>
+
+        <div class="equation">
+          aperture =
+          lerp(1.0, 0.25, earthquakeIntensity)
+        </div>
+
+        <p>
+          The aperture is smoothed over time and passed to a custom
+          material based on a Fresnel-style visual effect.
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="highlight">
+
+      <h2>Technical value</h2>
+
+      <p>
+        The project combines XR interaction, controller input,
+        numerical integration, rigid body physics, user-interface
+        feedback, spatial audio and VR comfort design inside a single
+        interactive Unity prototype.
+      </p>
+
+    </section>
+
+    <section class="code-section">
+
+      <h2>Source code</h2>
+
+      <p>
+        The selected files below contain the original project code.
+        Their filenames have been preserved to avoid changing the
+        Unity project structure.
+      </p>
+
+      <div class="code-grid">
+
+        <a
+          class="code-card"
+          href="code/EarthquakeManager.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>EarthquakeManager.cs</strong>
+
+          <span>
+            Controller input, oscillator dynamics, room movement,
+            vignette, lighting, audio, Richter UI and haptics
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/ChangeColor.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>ChangeColor.cs</strong>
+
+          <span>
+            Visual interaction feedback for selectable objects
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/MyHandController.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>MyHandController.cs</strong>
+
+          <span>
+            Grip and trigger input connected to hand animation
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/Vibration.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>Vibration.cs</strong>
+
+          <span>
+            Haptic interaction script containing the original
+            ActivarLinterna component
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/Luz.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>Luz.cs</strong>
+
+          <span>
+            Original UIBehaviour component connecting a slider
+            to light intensity
+          </span>
+
+        </a>
+
+      </div>
+
+      <div class="note">
+        The filenames Vibration.cs and Luz.cs are kept exactly as
+        they appear in the original Unity project. Their internal
+        component classes are named ActivarLinterna and UIBehaviour.
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 Filippo Falzi
+  </footer>
+
+</body>
+
+</html>
