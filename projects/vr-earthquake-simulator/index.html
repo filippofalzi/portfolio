@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Interactive VR earthquake simulator developed in Unity using Meta XR, controller velocity input and physics-based interaction."
+  >
+
+  <title>
+    VR Earthquake Simulator | Filippo Falzi
+  </title>
+
+  <link rel="icon" href="/portfolio/assets/favicon.svg" type="image/svg+xml">
+
+
+  <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    main {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 82px 7%;
+    }
+
+    section {
+      margin-bottom: 96px;
+    }
+
+    h1 {
+      max-width: 1050px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 7vw, 88px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    p {
+      max-width: 880px;
+      color: var(--stone);
+    }
+
+    .intro {
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .intro-text {
+      max-width: 850px;
+      color: var(--ink-soft);
+      font-size: 19px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 42px;
+    }
+
+    .detail-card,
+    .feature-card,
+    .pipeline-step {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .video-wrapper {
+      margin-top: 38px;
+      overflow: hidden;
+      background: var(--ink);
+      box-shadow: 0 24px 55px rgba(52, 50, 48, 0.12);
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      background: var(--ink);
+    }
+
+    .video-caption {
+      padding: 20px;
+      background: var(--card);
+      color: var(--stone);
+      font-size: 15px;
+      border-top: 1px solid var(--line);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 35px;
+    }
+
+    .feature-label {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .feature-card p,
+    .pipeline-step p {
+      color: var(--stone);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+      margin-top: 35px;
+    }
+
+    .pipeline-step span {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .equation-box {
+      margin-top: 35px;
+      padding: 34px;
+      background: var(--ink);
+      color: var(--white);
+      border-left: 6px solid var(--blue);
+    }
+
+    .equation-box p {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .equation {
+      margin: 20px 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--white);
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .highlight {
+      padding: 36px;
+      background: var(--card);
+      border-left: 6px solid var(--blue);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .highlight p {
+      max-width: 880px;
+    }
+
+    .code-section {
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
+    }
+
+    .code-section > p {
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .code-card {
+      display: block;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
+      text-decoration: none;
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .code-card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--mist);
+    }
+
+    .code-card strong {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .code-card span {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 25px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
+      }
+
+      main {
+        padding-top: 54px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .code-section {
+        padding: 28px;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  
+    /* Floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      padding: 9px 12px 9px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      color: rgba(255, 255, 255, 0.92);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        padding: 8px 9px 8px 14px;
+      }
+
+      .site-header .brand {
+        gap: 0;
+      }
+
+      .site-header .brand-name {
+        display: none;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+    }
+
+  
+    /* Final floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 9px 14px 9px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      color: var(--white);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    body.project-page main {
+      padding-top: 126px;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        gap: 8px;
+        padding: 8px 8px 8px 20px;
+      }
+
+      .site-header .brand-name {
+        display: flex;
+        gap: 5px;
+        font-size: 15px;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+        font-size: 11px;
+        letter-spacing: 0.015em;
+      }
+
+      body.project-page main {
+        padding-top: 106px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .site-header {
+        padding-left: 16px;
+      }
+
+      .site-header .brand-name {
+        font-size: 14px;
+      }
+
+      .site-header nav a {
+        padding-inline: 6px;
+        font-size: 10.5px;
+      }
+    }
+
+  
+    /* Brand alignment correction */
+    .site-header {
+      position: fixed;
+      justify-content: flex-end;
+      padding: 9px 14px 9px 30px;
+    }
+
+    .site-header .brand {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+
+    .site-header nav {
+      margin-left: auto;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        position: fixed;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 8px 9px 8px 20px;
+      }
+
+      .site-header .brand {
+        top: 50%;
+        left: 20px;
+        padding: 0;
+      }
+
+      .site-header nav {
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body id="top" class="project-page">
+
+  <header class="site-header">
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="intro">
+
+      <p class="tag">
+        Virtual Reality · Unity · Meta XR · Interactive Physics
+      </p>
+
+      <h1>
+        Interactive VR Earthquake Simulator
+      </h1>
+
+      <p class="intro-text">
+        A virtual reality prototype in which the physical movement
+        of an Oculus controller generates a simulated earthquake
+        inside an interactive room.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+
+          Unity, C#, Meta XR SDK and XR Interaction Toolkit
+        </div>
+
+        <div class="detail-card">
+          <strong>Interaction</strong>
+
+          Controller velocity, grip input and haptic feedback
+        </div>
+
+        <div class="detail-card">
+          <strong>Simulation</strong>
+
+          Spring-damper dynamics and rigid body response
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>Project overview</h2>
+
+      <p>
+        The project explores how movement captured by a virtual
+        reality controller can be converted into a dynamic physical
+        event.
+      </p>
+
+      <p>
+        When the user grabs and shakes the controller, its velocity
+        is measured and transformed into an external force applied
+        to the virtual room.
+      </p>
+
+      <p>
+        The room oscillates according to a spring-damper model,
+        while furniture and loose objects respond through Unity
+        rigid body physics.
+      </p>
+
+      <div class="video-wrapper">
+
+        <video
+          controls
+          preload="metadata"
+          poster="images/vr_earthquake_demo_poster.jpg"
+        >
+
+          <source
+            src="video/vr_earthquake_demo.mp4"
+            type="video/mp4"
+          >
+
+          Your browser does not support the video element.
+
+        </video>
+
+        <div class="video-caption">
+          Interactive demonstration showing the controller input,
+          room vibration, object response and Richter-scale feedback.
+        </div>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>1. XR controller interaction</h2>
+
+      <p>
+        The interaction begins when the user grabs the virtual
+        Oculus controller using the grip input.
+      </p>
+
+      <p>
+        The controller is configured as an XR Grab Interactable,
+        allowing the user to pick it up, hold it and move it naturally
+        inside the scene.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            GRAB INTERACTION
+          </span>
+
+          <h3>XR Grab Interactable</h3>
+
+          <p>
+            The controller can be selected and held using the
+            standard XR Interaction Toolkit workflow.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            HAND ANIMATION
+          </span>
+
+          <h3>Grip and trigger input</h3>
+
+          <p>
+            Grip and trigger values are connected to the hand
+            animator to reproduce the movement of the virtual fingers.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            ATTACHMENT
+          </span>
+
+          <h3>Relative hand alignment</h3>
+
+          <p>
+            A dedicated attach transform aligns the virtual hand
+            with the controller to improve the apparent grip position.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            VISUAL FEEDBACK
+          </span>
+
+          <h3>Interaction state</h3>
+
+          <p>
+            Interactive elements change appearance to provide
+            immediate visual feedback during hover and selection.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>2. Controller velocity input</h2>
+
+      <p>
+        The physical controller velocity is read from an Input Action
+        configured as a Vector3 value.
+      </p>
+
+      <p>
+        When a physical controller is not available, the XR Simulator
+        uses the difference between consecutive controller positions
+        to estimate velocity.
+      </p>
+
+      <div class="equation-box">
+
+        <h3>Simulator fallback</h3>
+
+        <div class="equation">
+          handVelocity =
+          (currentPosition - previousPosition) / deltaTime
+        </div>
+
+        <p>
+          This fallback makes it possible to test the complete
+          interaction using mouse and keyboard input inside the
+          Unity editor.
+        </p>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>3. Earthquake dynamics</h2>
+
+      <p>
+        The room is modelled as a forced and damped oscillator.
+        Controller velocity produces the external force that moves
+        the system away from its equilibrium position.
+      </p>
+
+      <div class="equation-box">
+
+        <h3>Spring-damper model</h3>
+
+        <div class="equation">
+          m · x'' + c · x' + k · x = F(t)
+        </div>
+
+        <p>
+          The stiffness term restores the room towards its original
+          position, while damping dissipates energy and gradually
+          stops the oscillation.
+        </p>
+
+      </div>
+
+      <div class="pipeline">
+
+        <article class="pipeline-step">
+
+          <span>STEP 01</span>
+
+          <h3>Read velocity</h3>
+
+          <p>
+            Controller movement is captured as a three-dimensional
+            velocity vector.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 02</span>
+
+          <h3>Generate force</h3>
+
+          <p>
+            The velocity is multiplied by an intensity factor to
+            obtain the external seismic force.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 03</span>
+
+          <h3>Integrate motion</h3>
+
+          <p>
+            Acceleration, velocity and displacement are updated
+            numerically every frame.
+          </p>
+
+        </article>
+
+        <article class="pipeline-step">
+
+          <span>STEP 04</span>
+
+          <h3>Move the room</h3>
+
+          <p>
+            The final displacement is applied to the complete room
+            container.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>4. Physical object response</h2>
+
+      <p>
+        Furniture and loose objects inside the room use Unity
+        Rigidbody components.
+      </p>
+
+      <p>
+        As the room moves, objects vibrate, slide and fall according
+        to the simulated acceleration and collision response.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            RIGID BODY PHYSICS
+          </span>
+
+          <h3>Dynamic furniture</h3>
+
+          <p>
+            Objects react independently to the movement of the room
+            through mass, gravity and collisions.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            COLLISION DETECTION
+          </span>
+
+          <h3>Continuous collisions</h3>
+
+          <p>
+            Continuous collision detection helps prevent fast-moving
+            objects from passing through the floor.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            INTERPOLATION
+          </span>
+
+          <h3>Smoother movement</h3>
+
+          <p>
+            Rigidbody interpolation reduces visible differences
+            between the physics update and the headset refresh rate.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            REAL-TIME RESPONSE
+          </span>
+
+          <h3>No prerecorded animation</h3>
+
+          <p>
+            The final motion depends directly on controller input
+            and the physical configuration of the scene.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>5. Multisensory feedback</h2>
+
+      <p>
+        The project combines visual, auditory and haptic feedback
+        to communicate earthquake intensity.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            USER INTERFACE
+          </span>
+
+          <h3>Richter-scale display</h3>
+
+          <p>
+            A screen-space interface displays a smoothed intensity
+            value that changes colour at high magnitudes.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            LIGHTING
+          </span>
+
+          <h3>Dynamic flickering</h3>
+
+          <p>
+            Ceiling-light intensity changes in proportion to the
+            seismic input.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            SPATIAL AUDIO
+          </span>
+
+          <h3>Earthquake rumble</h3>
+
+          <p>
+            Volume is modulated in real time according to the
+            intensity of the controller movement.
+          </p>
+
+        </article>
+
+        <article class="feature-card">
+
+          <span class="feature-label">
+            HAPTICS
+          </span>
+
+          <h3>Controller vibration</h3>
+
+          <p>
+            Haptic impulses are generated when the measured
+            earthquake intensity exceeds a threshold.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <section>
+
+      <h2>6. VR comfort vignette</h2>
+
+      <p>
+        Rapid movement of the room can increase discomfort in
+        virtual reality.
+      </p>
+
+      <p>
+        To reduce this effect, a custom vignette progressively
+        narrows the visible field of view when the simulated
+        earthquake becomes stronger.
+      </p>
+
+      <div class="equation-box">
+
+        <h3>Dynamic aperture</h3>
+
+        <div class="equation">
+          aperture =
+          lerp(1.0, 0.25, earthquakeIntensity)
+        </div>
+
+        <p>
+          The aperture is smoothed over time and passed to a custom
+          material based on a Fresnel-style visual effect.
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="highlight">
+
+      <h2>Technical value</h2>
+
+      <p>
+        The project combines XR interaction, controller input,
+        numerical integration, rigid body physics, user-interface
+        feedback, spatial audio and VR comfort design inside a single
+        interactive Unity prototype.
+      </p>
+
+    </section>
+
+    <section class="code-section">
+
+      <h2>Source code</h2>
+
+      <p>
+        The selected files below contain the original project code.
+        Their filenames have been preserved to avoid changing the
+        Unity project structure.
+      </p>
+
+      <div class="code-grid">
+
+        <a
+          class="code-card"
+          href="code/EarthquakeManager.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>EarthquakeManager.cs</strong>
+
+          <span>
+            Controller input, oscillator dynamics, room movement,
+            vignette, lighting, audio, Richter UI and haptics
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/ChangeColor.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>ChangeColor.cs</strong>
+
+          <span>
+            Visual interaction feedback for selectable objects
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/MyHandController.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>MyHandController.cs</strong>
+
+          <span>
+            Grip and trigger input connected to hand animation
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/Vibration.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>Vibration.cs</strong>
+
+          <span>
+            Haptic interaction script containing the original
+            ActivarLinterna component
+          </span>
+
+        </a>
+
+        <a
+          class="code-card"
+          href="code/Luz.cs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <strong>Luz.cs</strong>
+
+          <span>
+            Original UIBehaviour component connecting a slider
+            to light intensity
+          </span>
+
+        </a>
+
+      </div>
+
+      <div class="note">
+        The filenames Vibration.cs and Luz.cs are kept exactly as
+        they appear in the original Unity project. Their internal
+        component classes are named ActivarLinterna and UIBehaviour.
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+</body>
+
+</html>
