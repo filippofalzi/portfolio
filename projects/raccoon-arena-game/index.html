@@ -18,7 +18,22 @@
     Raccoon vs. the Rat | Filippo Falzi
   </title>
 
+
   <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -30,10 +45,12 @@
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f5f5f5;
-      color: #151515;
-      line-height: 1.6;
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
     }
 
     a {
@@ -41,43 +58,96 @@
     }
 
     header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 20px;
-      padding: 24px 8%;
-      background: #111;
-      color: white;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
     }
 
-    header a {
-      color: white;
+    .brand {
+      color: var(--white);
       text-decoration: none;
     }
 
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
     main {
-      width: 100%;
-      max-width: 1200px;
+      width: min(1200px, 100%);
       margin: auto;
-      padding: 80px 8%;
+      padding: 82px 7%;
     }
 
     section {
-      margin-bottom: 95px;
+      margin-bottom: 96px;
     }
 
     h1 {
       max-width: 1000px;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
       font-size: clamp(44px, 7vw, 88px);
+      font-weight: 700;
       line-height: 0.98;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.045em;
     }
 
     h2 {
       margin-bottom: 20px;
-      font-size: 36px;
-      line-height: 1.15;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
     }
 
     h3 {
@@ -88,7 +158,7 @@
 
     p {
       max-width: 880px;
-      color: #565656;
+      color: var(--stone);
     }
 
     section > p + p {
@@ -96,225 +166,219 @@
     }
 
     .intro {
-      margin-bottom: 90px;
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
     }
 
     .tag {
       margin-bottom: 16px;
-      color: #777;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 0.08em;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .intro-text {
       max-width: 850px;
+      color: var(--ink-soft);
       font-size: 19px;
     }
 
     .details {
       display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(210px, 1fr)
-      );
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
       margin-top: 42px;
     }
 
-    .detail-card {
-      padding: 25px;
-      background: white;
+    .detail-card,
+    .feature-card,
+    .pipeline-step {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
     }
 
     .detail-card strong {
       display: block;
       margin-bottom: 8px;
-      color: #111;
+      color: var(--ink);
     }
 
     .video-wrapper {
       margin-top: 38px;
       overflow: hidden;
-      background: #111;
+      background: var(--ink);
+      box-shadow: 0 24px 55px rgba(52, 50, 48, 0.12);
     }
 
     video {
       width: 100%;
       display: block;
-      background: #111;
+      background: var(--ink);
     }
 
     .video-caption {
       padding: 20px;
-      background: white;
-      color: #666;
+      background: var(--card);
+      color: var(--stone);
       font-size: 15px;
+      border-top: 1px solid var(--line);
     }
 
     .feature-grid {
       display: grid;
-      grid-template-columns: repeat(
-        2,
-        minmax(0, 1fr)
-      );
-      gap: 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
       margin-top: 35px;
-    }
-
-    .feature-card {
-      padding: 28px;
-      background: white;
     }
 
     .feature-label {
       display: block;
       margin-bottom: 12px;
-      color: #777;
+      color: var(--blue-dark);
       font-size: 13px;
-      font-weight: bold;
+      font-weight: 900;
       letter-spacing: 0.08em;
     }
 
-    .feature-card p {
-      color: #666;
+    .feature-card p,
+    .pipeline-step p {
+      color: var(--stone);
     }
 
     .pipeline {
       display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(205px, 1fr)
-      );
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
       gap: 18px;
       margin-top: 35px;
-    }
-
-    .pipeline-step {
-      padding: 24px;
-      background: white;
     }
 
     .pipeline-step span {
       display: block;
       margin-bottom: 10px;
-      color: #777;
+      color: var(--blue-dark);
       font-size: 13px;
-      font-weight: bold;
-    }
-
-    .pipeline-step p {
-      color: #666;
-      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
     }
 
     .dark-section {
       padding: 42px;
-      background: #111;
-      color: white;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
     }
 
     .dark-section p {
-      color: #ccc;
+      color: rgba(255, 255, 255, 0.72);
     }
 
     .dark-grid {
       display: grid;
-      grid-template-columns: repeat(
-        2,
-        minmax(0, 1fr)
-      );
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 20px;
       margin-top: 32px;
     }
 
     .dark-card {
       padding: 25px;
-      border: 1px solid #444;
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .dark-card span {
       display: block;
       margin-bottom: 10px;
-      color: #999;
+      color: var(--mist);
       font-size: 13px;
-      font-weight: bold;
+      font-weight: 900;
       letter-spacing: 0.08em;
     }
 
     .dark-card p {
-      color: #bbb;
+      color: rgba(255, 255, 255, 0.70);
     }
 
     .highlight {
       padding: 36px;
-      background: white;
-      border-left: 5px solid #111;
-    }
-
-    .highlight p {
-      max-width: 880px;
+      background: var(--card);
+      border-left: 6px solid var(--blue);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
     }
 
     .comparison-table {
       width: 100%;
       margin-top: 35px;
       border-collapse: collapse;
-      background: white;
+      background: var(--card);
     }
 
     .comparison-table th,
     .comparison-table td {
       padding: 17px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--line);
       text-align: left;
       vertical-align: top;
     }
 
     .comparison-table th {
-      background: #111;
-      color: white;
+      background: var(--ink);
+      color: var(--white);
     }
 
     .comparison-table td {
-      color: #555;
+      color: var(--stone);
     }
 
     .code-section {
-      padding: 40px;
-      background: #111;
-      color: white;
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
     }
 
     .code-section > p {
       margin-bottom: 30px;
-      color: #ccc;
+      color: rgba(255, 255, 255, 0.72);
     }
 
     .code-grid {
       display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(245px, 1fr)
-      );
+      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
       gap: 16px;
     }
 
     .code-card {
       display: block;
       padding: 22px;
-      border: 1px solid #444;
-      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
       text-decoration: none;
       transition:
+        transform 0.2s ease,
         background 0.2s ease,
         border-color 0.2s ease;
     }
 
     .code-card:hover {
-      background: #222;
-      border-color: #888;
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--mist);
     }
 
     .code-card strong {
@@ -323,32 +387,56 @@
     }
 
     .code-card span {
-      color: #aaa;
+      color: rgba(255, 255, 255, 0.62);
       font-size: 14px;
     }
 
     .note {
       margin-top: 25px;
       padding: 22px;
-      background: #ededed;
-      color: #555;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.72);
       font-size: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     footer {
-      padding: 30px 8%;
-      background: #111;
-      color: #aaa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
     }
 
     @media (max-width: 750px) {
       header {
+        position: relative;
         align-items: flex-start;
         flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
       }
 
       main {
-        padding-top: 50px;
+        padding-top: 54px;
       }
 
       .feature-grid,
@@ -365,20 +453,31 @@
         display: block;
         overflow-x: auto;
       }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
+
 </head>
 
-<body>
+<body id="top">
 
   <header>
-    <a href="../../index.html">
-      <strong>FILIPPO FALZI</strong>
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
     </a>
 
-    <a href="../../index.html">
-      Back to portfolio
-    </a>
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
   </header>
 
   <main>
@@ -1293,7 +1392,8 @@
   </main>
 
   <footer>
-    © 2026 Filippo Falzi
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
   </footer>
 
 </body>
