@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Monte Carlo Rendering | Filippo Falzi</title>
+
+  <link rel="icon" href="/portfolio/assets/favicon.svg" type="image/svg+xml">
+
+
+  <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    main {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 82px 7%;
+    }
+
+    section {
+      margin-bottom: 96px;
+    }
+
+    .intro {
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 1000px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 7vw, 88px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .intro-text {
+      max-width: 820px;
+      color: var(--ink-soft);
+      font-size: 19px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 40px;
+    }
+
+    .detail-card {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    section > p {
+      max-width: 860px;
+      margin-bottom: 18px;
+      color: var(--stone);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 35px;
+    }
+
+    .image-card {
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 16px 35px rgba(52, 50, 48, 0.06);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .image-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 45px rgba(52, 50, 48, 0.10);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 360px;
+      display: block;
+      object-fit: contain;
+      background: #e7e5e1;
+    }
+
+    .image-content {
+      padding: 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    .image-content p {
+      color: var(--stone);
+      font-size: 15px;
+    }
+
+    .wide-card {
+      grid-column: 1 / -1;
+    }
+
+    .wide-card img {
+      height: auto;
+      max-height: 700px;
+    }
+
+    .highlight {
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
+    }
+
+    .highlight h2 {
+      color: var(--white);
+    }
+
+    .highlight p {
+      max-width: 820px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
+      }
+
+      main {
+        padding-top: 54px;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .wide-card {
+        grid-column: auto;
+      }
+
+      .image-card img {
+        height: auto;
+      }
+
+      .highlight {
+        padding: 28px;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  
+    /* Floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      padding: 9px 12px 9px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      color: rgba(255, 255, 255, 0.92);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        padding: 8px 9px 8px 14px;
+      }
+
+      .site-header .brand {
+        gap: 0;
+      }
+
+      .site-header .brand-name {
+        display: none;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+    }
+
+  
+    /* Final floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 9px 14px 9px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      color: var(--white);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    body.project-page main {
+      padding-top: 126px;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        gap: 8px;
+        padding: 8px 8px 8px 20px;
+      }
+
+      .site-header .brand-name {
+        display: flex;
+        gap: 5px;
+        font-size: 15px;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+        font-size: 11px;
+        letter-spacing: 0.015em;
+      }
+
+      body.project-page main {
+        padding-top: 106px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .site-header {
+        padding-left: 16px;
+      }
+
+      .site-header .brand-name {
+        font-size: 14px;
+      }
+
+      .site-header nav a {
+        padding-inline: 6px;
+        font-size: 10.5px;
+      }
+    }
+
+  
+    /* Brand alignment correction */
+    .site-header {
+      position: fixed;
+      justify-content: flex-end;
+      padding: 9px 14px 9px 30px;
+    }
+
+    .site-header .brand {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+
+    .site-header nav {
+      margin-left: auto;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        position: fixed;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 8px 9px 8px 20px;
+      }
+
+      .site-header .brand {
+        top: 50%;
+        left: 20px;
+        padding: 0;
+      }
+
+      .site-header nav {
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body id="top" class="project-page">
+
+  <header class="site-header">
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="intro">
+      <p class="tag">
+        Advanced Rendering · C++ · Monte Carlo Methods · University Project
+      </p>
+
+      <h1>
+        Monte Carlo Rendering and Path Tracing
+      </h1>
+
+      <p class="intro-text">
+        A progressive rendering project developed with the Nori framework,
+        covering probability sampling, direct illumination, multiple
+        importance sampling and recursive path tracing with global illumination.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+          C++, Nori, Monte Carlo integration
+        </div>
+
+        <div class="detail-card">
+          <strong>Topics</strong>
+          Importance sampling, MIS, NEE and path tracing
+        </div>
+
+        <div class="detail-card">
+          <strong>Role</strong>
+          Algorithm implementation, testing and visual analysis
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Project overview</h2>
+
+      <p>
+        This project was developed through three consecutive assignments,
+        progressively extending a physically based renderer.
+      </p>
+
+      <p>
+        The first stage focused on probability distributions and sampling
+        techniques. The second introduced direct illumination from area lights
+        and Multiple Importance Sampling. The final stage implemented recursive
+        path tracing, indirect illumination, Russian roulette and Next Event
+        Estimation.
+      </p>
+    </section>
+
+    <section>
+      <h2>1. Sampling and probability distributions</h2>
+
+      <p>
+        The first stage implemented mappings from a uniform square distribution
+        to different target domains, including triangular and hemispherical
+        distributions.
+      </p>
+
+      <p>
+        Each sampling method was paired with its corresponding probability
+        density function and validated through statistical tests.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/01_tent_sampling.jpg"
+            alt="Uniform sampling over a triangular tent domain"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Triangle sampling</h3>
+
+            <p>
+              Transformation of uniformly distributed samples from a square
+              domain to an isosceles triangular domain.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/02_cosine_heisphere.jpg"
+            alt="Cosine-weighted hemisphere sampling"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Cosine-weighted hemisphere</h3>
+
+            <p>
+              Samples are concentrated around the normal direction according
+              to a cosine-weighted probability distribution.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Direct illumination</h2>
+
+      <p>
+        A direct illumination integrator was implemented to evaluate light
+        transport between surfaces and area emitters.
+      </p>
+
+      <p>
+        Increasing the number of samples per pixel progressively reduces
+        variance and produces cleaner shadows and smoother illumination.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/03_direct_illumination_32_samples.jpg"
+            alt="Direct illumination rendered with 32 samples"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>32 samples per pixel</h3>
+
+            <p>
+              The first approximation contains visible Monte Carlo noise,
+              especially in shadows and indirectly illuminated areas.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/04_direct_illumination_512_samples.jpg"
+            alt="Direct illumination rendered with 512 samples"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>512 samples per pixel</h3>
+
+            <p>
+              A higher sample count produces a more stable and visually
+              converged result.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Light sampling and MIS</h2>
+
+      <p>
+        The renderer was extended to sample area lights directly. Emitters were
+        selected according to a probability distribution weighted by their
+        radiance and surface area.
+      </p>
+
+      <p>
+        Multiple Importance Sampling combines light sampling and BSDF sampling,
+        weighting both strategies to reduce variance under different lighting
+        and material conditions.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/05_light_sampling_two_lights_32.jpg"
+            alt="Light sampling with two lights and 32 samples"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Light sampling · 32 samples</h3>
+
+            <p>
+              Directly sampling the emitters improves convergence in scenes
+              with diffuse materials and area lights.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/06_light_sampling_two_lights_512.jpg"
+            alt="Light sampling with two lights and 512 samples"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Light sampling · 512 samples</h3>
+
+            <p>
+              Increasing the sample count produces smoother shadows and a
+              cleaner illumination result.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card wide-card">
+          <img
+            src="images/07_mis_two_lights_32.jpg"
+            alt="Multiple Importance Sampling with two area lights"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Multiple Importance Sampling</h3>
+
+            <p>
+              Light sampling and BSDF sampling are combined through balance
+              heuristics to select the most effective contribution.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Standard path tracing</h2>
+
+      <p>
+        The standard path tracer recursively follows directions sampled from
+        the material BSDF. Light is accumulated when a path eventually reaches
+        an emitter.
+      </p>
+
+      <p>
+        This approach produces physically meaningful indirect illumination,
+        but it converges slowly when the probability of reaching a light source
+        is low.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card wide-card">
+          <img
+            src="images/08_path_tracing_32_samples.jpg"
+            alt="Standard path tracer with 32 samples"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Standard path tracer · 32 samples</h3>
+
+            <p>
+              Strong variance is visible because light sources are only found
+              through random recursive paths.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Path tracing with Next Event Estimation</h2>
+
+      <p>
+        The NEE integrator generates a direct-light sample at every diffuse
+        bounce while continuing the recursive indirect path.
+      </p>
+
+      <p>
+        This strategy reduces noise considerably because the renderer does not
+        rely exclusively on random paths to reach a light source.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card wide-card">
+          <img
+            src="images/09_path_nee_depth_comparison.jpg"
+            alt="Comparison of different path depths using Next Event Estimation"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Path depth comparison</h3>
+
+            <p>
+              Comparison between different maximum path depths. After several
+              indirect bounces, the increase in illumination becomes
+              progressively smaller and the result stabilizes.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/10_path_nee_512_samples.jpg"
+            alt="Path tracing with Next Event Estimation at 512 samples"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>NEE path tracer · 512 samples</h3>
+
+            <p>
+              Direct and indirect illumination are combined to achieve a
+              cleaner and more stable result.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/11_path_nee_gold_material.jpg"
+            alt="Golden reflective material rendered with path tracing"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Specular gold material</h3>
+
+            <p>
+              The final implementation supports recursive light transport and
+              reflective materials, producing complex reflections and global
+              illumination.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="highlight">
+      <h2>Implementation note</h2>
+
+      <p>
+        The project was developed by extending the Nori educational rendering
+        framework. The complete source code is not publicly distributed because
+        it contains solutions to university assignments. This page focuses on
+        the implemented techniques, experimental comparisons and final visual
+        results.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+</body>
+</html>
