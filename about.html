@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="About Filippo Falzi — mechanical engineer and computer graphics specialist focused on rendering, simulation, interactive systems and visual communication."
+  >
+
+  <link rel="icon" href="/portfolio/assets/favicon.svg" type="image/svg+xml">
+  
+  <title>About | Filippo Falzi</title>
+
+  <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.94);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: calc(100vh - 76px);
+      display: flex;
+      align-items: center;
+      padding: 90px 7%;
+      color: var(--white);
+      background:
+        linear-gradient(
+          90deg,
+          rgba(20, 29, 58, 0.88) 0%,
+          rgba(20, 29, 58, 0.72) 34%,
+          rgba(20, 29, 58, 0.28) 64%,
+          rgba(20, 29, 58, 0.08) 100%
+        ),
+        linear-gradient(
+          to top,
+          rgba(20, 29, 58, 0.52) 0%,
+          rgba(20, 29, 58, 0.02) 55%
+        ),
+        url("assets/home-illustration.png");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 7%;
+      bottom: 0;
+      width: 150px;
+      height: 8px;
+      background: var(--mist);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 3px;
+      background: var(--blue);
+    }
+
+    h1 {
+      max-width: 900px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(54px, 8vw, 108px);
+      font-weight: 700;
+      line-height: 0.92;
+      letter-spacing: -0.055em;
+      color: var(--white);
+      text-shadow: 0 4px 22px rgba(0, 0, 0, 0.34);
+    }
+
+    .hero-intro {
+      max-width: 720px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: clamp(18px, 2vw, 22px);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 12px 20px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      font-weight: 800;
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-3px);
+    }
+
+    .button-primary {
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    .button-primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .button-secondary {
+      color: var(--white);
+      border-color: rgba(255, 255, 255, 0.56);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+    }
+
+    .button-secondary:hover {
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .section {
+      padding: 90px 7%;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: 0.7fr 1.3fr;
+      gap: 50px;
+      margin-bottom: 48px;
+    }
+
+    .section-kicker {
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      max-width: 760px;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .story-card {
+      padding: 32px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .story-card p {
+      color: var(--stone);
+      font-size: 17px;
+    }
+
+    .story-card p + p {
+      margin-top: 18px;
+    }
+
+    .skills-section {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .skills-section .section-kicker {
+      color: var(--mist);
+    }
+
+    .skills-section .section-heading h2 {
+      color: var(--white);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .skill-card {
+      min-height: 230px;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .skill-card:nth-child(2) {
+      background: rgba(97, 115, 146, 0.16);
+    }
+
+    .skill-card:nth-child(3) {
+      background: rgba(133, 120, 104, 0.14);
+    }
+
+    .skill-card span {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--mist);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .skill-card h3 {
+      margin-bottom: 14px;
+      font-size: 26px;
+      line-height: 1.1;
+    }
+
+    .skill-card p {
+      color: rgba(255, 255, 255, 0.70);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .timeline-year {
+      color: var(--blue-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 23px;
+      font-style: italic;
+    }
+
+    .timeline-item h3 {
+      margin-bottom: 7px;
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    .timeline-item p {
+      color: var(--stone);
+    }
+
+    .experience-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 24px;
+    }
+
+    .experience-main,
+    .experience-side {
+      padding: 34px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .experience-main h3,
+    .experience-side h3 {
+      margin-bottom: 14px;
+      font-size: 27px;
+      line-height: 1.1;
+    }
+
+    .experience-main p,
+    .experience-side p {
+      color: var(--stone);
+    }
+
+    .experience-side ul {
+      margin-top: 18px;
+      padding-left: 20px;
+      color: var(--stone);
+    }
+
+    .experience-side li + li {
+      margin-top: 8px;
+    }
+
+    .languages {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .language-card {
+      padding: 22px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .language-card strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 19px;
+    }
+
+    .language-card span {
+      color: var(--stone);
+    }
+
+    .contact {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 30px;
+      padding: 58px 7%;
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    .contact h2 {
+      max-width: 760px;
+      font-size: clamp(34px, 4.5vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .contact-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 10px 17px;
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.52);
+      text-decoration: none;
+      font-weight: 800;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease;
+    }
+
+    .contact-links a:hover {
+      background: var(--white);
+      color: var(--blue-dark);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.76);
+      text-decoration: none;
+    }
+
+    @media (max-width: 950px) {
+      .section-heading {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .experience-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-links {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
+      }
+
+      .hero {
+        min-height: 82vh;
+        align-items: flex-end;
+        padding: 62px 7% 70px;
+        background:
+          linear-gradient(
+            to top,
+            rgba(20, 29, 58, 0.94) 0%,
+            rgba(20, 29, 58, 0.66) 55%,
+            rgba(20, 29, 58, 0.16) 100%
+          ),
+          url("assets/home-illustration.png");
+        background-position: 62% center;
+        background-size: cover;
+      }
+
+      h1 {
+        font-size: clamp(50px, 18vw, 78px);
+      }
+
+      .section {
+        padding: 68px 7%;
+      }
+
+      .story-grid,
+      .languages {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .story-card,
+      .experience-main,
+      .experience-side {
+        padding: 26px;
+      }
+
+      .contact {
+        padding: 48px 7%;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  
+    /* Final floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 9px 14px 9px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      color: var(--white);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    body.project-page main {
+      padding-top: 126px;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        gap: 8px;
+        padding: 8px 8px 8px 20px;
+      }
+
+      .site-header .brand-name {
+        display: flex;
+        gap: 5px;
+        font-size: 15px;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+        font-size: 11px;
+        letter-spacing: 0.015em;
+      }
+
+      body.project-page main {
+        padding-top: 106px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .site-header {
+        padding-left: 16px;
+      }
+
+      .site-header .brand-name {
+        font-size: 14px;
+      }
+
+      .site-header nav a {
+        padding-inline: 6px;
+        font-size: 10.5px;
+      }
+    }
+
+  
+    /* Brand alignment correction */
+    .site-header {
+      position: fixed;
+      justify-content: flex-end;
+      padding: 9px 14px 9px 30px;
+    }
+
+    .site-header .brand {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+
+    .site-header nav {
+      margin-left: auto;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        position: fixed;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 8px 9px 8px 20px;
+      }
+
+      .site-header .brand {
+        top: 50%;
+        left: 20px;
+        padding: 0;
+      }
+
+      .site-header nav {
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+      }
+    }
+
+  </style>
+</head>
+
+<body id="top">
+
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a href="index.html#projects">Projects</a>
+      <a href="about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+
+      <div class="hero-copy">
+        <p class="eyebrow">
+          Mechanical engineering · Computer graphics · Visual design
+        </p>
+
+        <h1>
+          About me
+        </h1>
+
+        <p class="hero-intro">
+          I am a mechanical engineer with an MSc in Computer Graphics,
+          Games and Virtual Reality. My academic projects focus on rendering,
+          simulation, real-time systems and interactive experiences.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="index.html#projects">
+            View projects
+          </a>
+
+          <a
+            class="button button-secondary"
+            href="Filippo_Falzi_CV.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download CV
+          </a>
+        </div>
+      </div>
+
+
+    </section>
+
+    <section class="section">
+
+      <div class="section-heading">
+        <p class="section-kicker">My path</p>
+
+        <h2>
+          From mechanical engineering to computer graphics.
+        </h2>
+      </div>
+
+      <div class="story-grid">
+
+        <article class="story-card">
+          <p>
+            My background in mechanical engineering shaped the way I
+            approach computer graphics: through structure, mathematics
+            and physical reasoning.
+          </p>
+
+          <p>
+            After graduating from Politecnico di Milano, I specialised
+            in Computer Graphics, Games and Virtual Reality at Universidad
+            Rey Juan Carlos, where I developed projects involving rendering,
+            GPU programming, simulation, Unity and immersive interaction.
+          </p>
+        </article>
+
+        <article class="story-card">
+          <p>
+            I am especially interested in the point where technical systems
+            and visual design meet. I enjoy understanding how things work,
+            implementing them from the ground up and presenting the result
+            in a clear and engaging way.
+          </p>
+
+          <p>
+            Illustration, drawing and digital art remain an important part
+            of my practice and influence how I approach interfaces, scenes,
+            composition and visual communication.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section skills-section">
+
+      <div class="section-heading">
+        <p class="section-kicker">What I work with</p>
+
+        <h2>
+          Technical systems, visual tools and interactive experiences.
+        </h2>
+      </div>
+
+      <div class="skills-grid">
+
+        <article class="skill-card">
+          <span>Graphics and programming</span>
+
+          <h3>Rendering and real-time development</h3>
+
+          <p>
+            C++, C#, OpenGL, Vulkan, HLSL, Unity, MATLAB and GPU-oriented
+            programming for graphics and simulation.
+          </p>
+        </article>
+
+        <article class="skill-card">
+          <span>Simulation</span>
+
+          <h3>Physics-based systems</h3>
+
+          <p>
+            Numerical integration, deformable bodies, finite elements,
+            fluids, rigid-body dynamics, cloth and particle-grid methods.
+          </p>
+        </article>
+
+        <article class="skill-card">
+          <span>Visual communication</span>
+
+          <h3>Design and illustration</h3>
+
+          <p>
+            3D modelling, illustration, drawing, comic sketching,
+            digital graphics and visual presentation of technical ideas.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section">
+
+      <div class="section-heading">
+        <p class="section-kicker">Education</p>
+
+        <h2>
+          My academic background.
+        </h2>
+      </div>
+
+      <div class="timeline">
+
+        <article class="timeline-item">
+          <div class="timeline-year">2025</div>
+
+          <div>
+            <h3>
+              Master's Degree in Computer Graphics, Games and Virtual Reality
+            </h3>
+
+            <p>
+              Universidad Rey Juan Carlos, Madrid.
+            </p>
+          </div>
+        </article>
+
+        <article class="timeline-item">
+          <div class="timeline-year">2022</div>
+
+          <div>
+            <h3>Course in Illustration</h3>
+
+            <p>
+              IED — Istituto Europeo di Design.
+            </p>
+          </div>
+        </article>
+
+        <article class="timeline-item">
+          <div class="timeline-year">2017–2021</div>
+
+          <div>
+            <h3>BSc in Mechanical Engineering</h3>
+
+            <p>
+              Politecnico di Milano.
+            </p>
+          </div>
+        </article>
+
+        <article class="timeline-item">
+          <div class="timeline-year">2019</div>
+
+          <div>
+            <h3>Erasmus Semester</h3>
+
+            <p>
+              University of Gran Canaria, Spain.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section">
+
+      <div class="section-heading">
+        <p class="section-kicker">Languages</p>
+
+        <h2>
+          Languages I use for study, work and communication.
+        </h2>
+      </div>
+
+      <div class="languages">
+
+        <div class="language-card">
+          <strong>Italian</strong>
+          <span>Native</span>
+        </div>
+
+        <div class="language-card">
+          <strong>Spanish</strong>
+          <span>Advanced</span>
+        </div>
+
+        <div class="language-card">
+          <strong>English</strong>
+          <span>Advanced</span>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="contact">
+
+      <div>
+        <p style="margin-bottom: 8px; color: rgba(255,255,255,0.72); font-size: 13px; font-weight: 900; letter-spacing: 0.13em; text-transform: uppercase;">
+          Contact
+        </p>
+
+        <h2>
+          Email, LinkedIn and GitHub.
+        </h2>
+      </div>
+
+      <div class="contact-links">
+        <a href="mailto:filippo.falzi@live.com">Email</a>
+
+        <a
+          href="https://www.linkedin.com/in/filippofalzi/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          LinkedIn
+        </a>
+
+        <a
+          href="https://github.com/filippofalzi"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+</body>
+</html>
