@@ -1,1 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>2D Fluid Simulation | Filippo Falzi</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      color: #151515;
+      line-height: 1.6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 24px 8%;
+      background: #111;
+      color: white;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 80px 8%;
+    }
+
+    section {
+      margin-bottom: 95px;
+    }
+
+    h1 {
+      max-width: 1050px;
+      margin-bottom: 30px;
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: 1;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 36px;
+      line-height: 1.15;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    section > p {
+      max-width: 860px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .intro {
+      margin-bottom: 90px;
+    }
+
+    .tag {
+      margin-bottom: 15px;
+      color: #666;
+    }
+
+    .intro-text {
+      max-width: 830px;
+      color: #555;
+      font-size: 19px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .detail-card {
+      padding: 25px;
+      background: white;
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .phase-label {
+      display: inline-block;
+      margin-bottom: 15px;
+      padding: 7px 11px;
+      background: #111;
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+    }
+
+    .video-wrapper {
+      margin-top: 35px;
+      overflow: hidden;
+      background: #111;
+    }
+
+    video {
+      width: 100%;
+      max-height: 720px;
+      display: block;
+      background: #111;
+    }
+
+    .video-caption {
+      padding: 20px;
+      background: white;
+      color: #666;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+      margin-top: 35px;
+    }
+
+    .image-card {
+      overflow: hidden;
+      background: white;
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 430px;
+      display: block;
+      object-fit: contain;
+      background: #111;
+    }
+
+    .image-content {
+      padding: 22px;
+    }
+
+    .image-content p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 35px;
+    }
+
+    .feature-card {
+      padding: 28px;
+      background: white;
+    }
+
+    .feature-card p {
+      color: #666;
+    }
+
+    .feature-label {
+      display: block;
+      margin-bottom: 12px;
+      color: #777;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+      margin-top: 35px;
+    }
+
+    .pipeline-step {
+      padding: 24px;
+      background: white;
+    }
+
+    .pipeline-step span {
+      display: block;
+      margin-bottom: 10px;
+      color: #777;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .pipeline-step p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .equation-box {
+      margin-top: 35px;
+      padding: 35px;
+      background: #111;
+      color: white;
+    }
+
+    .equation-box p {
+      max-width: 850px;
+      color: #ccc;
+    }
+
+    .equation {
+      margin: 20px 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: #1c1c1c;
+      color: white;
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      margin-top: 35px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 17px;
+      border: 1px solid #ddd;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .comparison-table th {
+      background: #111;
+      color: white;
+    }
+
+    .comparison-table td {
+      color: #555;
+    }
+
+    .highlight {
+      padding: 35px;
+      background: white;
+      border-left: 5px solid #111;
+    }
+
+    .highlight p {
+      max-width: 860px;
+      color: #555;
+    }
+
+    .code-section {
+      padding: 40px;
+      background: #111;
+      color: white;
+    }
+
+    .code-section > p {
+      max-width: 850px;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .code-group {
+      margin-top: 35px;
+    }
+
+    .code-group h3 {
+      margin-bottom: 18px;
+    }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .code-card {
+      display: block;
+      padding: 22px;
+      border: 1px solid #444;
+      color: white;
+      text-decoration: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .code-card:hover {
+      background: #222;
+      border-color: #888;
+    }
+
+    .code-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .code-card span {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    footer {
+      padding: 30px 8%;
+      background: #111;
+      color: #aaa;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      main {
+        padding-top: 50px;
+      }
+
+      .gallery,
+      .feature-grid,
+      .code-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-card img {
+        height: auto;
+      }
+
+      .comparison-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .code-section {
+        padding: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <a href="../../index.html">
+      <strong>FILIPPO FALZI</strong>
+    </a>
+
+    <a href="../../index.html">
+      Back to portfolio
+    </a>
+  </header>
+
+  <main>
+
+    <section class="intro">
+      <p class="tag">
+        Fluid Dynamics · C++ · Numerical Simulation · Particle-Grid Methods
+      </p>
+
+      <h1>
+        2D Fluid Simulation: Eulerian and PIC/FLIP Methods
+      </h1>
+
+      <p class="intro-text">
+        A two-stage fluid dynamics project developed in C++, beginning with a
+        grid-based Eulerian solver and later extending it into a hybrid
+        particle-grid simulator using PIC and FLIP velocity transfers.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+          C++, FreeGLUT, sparse matrices and PCG
+        </div>
+
+        <div class="detail-card">
+          <strong>Eulerian solver</strong>
+          Advection, viscosity, pressure projection and incompressibility
+        </div>
+
+        <div class="detail-card">
+          <strong>Hybrid extension</strong>
+          Particles, PIC/FLIP transfers and Runge–Kutta integration
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Project overview</h2>
+
+      <p>
+        This project was developed through two connected fluid simulation
+        assignments. The first stage implemented a complete two-dimensional
+        Eulerian fluid solver on a fixed regular grid.
+      </p>
+
+      <p>
+        The second stage retained the grid-based pressure solver while adding
+        particles to carry velocity and colour information. This produced a
+        hybrid PIC/FLIP simulation capable of preserving more detail and
+        kinetic energy.
+      </p>
+    </section>
+
+    <section>
+      <span class="phase-label">PHASE 01</span>
+
+      <h2>Eulerian fluid simulation</h2>
+
+      <p>
+        In the Eulerian formulation, fluid properties are stored at fixed grid
+        locations. Velocity, ink, pressure and other quantities evolve inside
+        a stationary two-dimensional domain.
+      </p>
+
+      <p>
+        Each simulation step performs emission, advection, external-force
+        integration, viscosity and pressure projection.
+      </p>
+
+      <div class="video-wrapper">
+        <video controls preload="metadata">
+          <source
+            src="video/eulerian_fluid_demo.mp4"
+            type="video/mp4"
+          >
+
+          Your browser does not support the video element.
+        </video>
+
+        <div class="video-caption">
+          Eulerian fluid simulation showing RGB ink emission, advection,
+          viscosity and pressure-driven incompressible motion.
+        </div>
+      </div>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/01_eulerian_initial.webp"
+            alt="Initial stage of the Eulerian fluid simulation"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Initial Eulerian flow</h3>
+
+            <p>
+              Coloured ink is introduced into the fixed grid and begins to
+              follow the simulated velocity field.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/02_eulerian_developed.webp"
+            alt="Developed stage of the Eulerian fluid simulation"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Developed Eulerian flow</h3>
+
+            <p>
+              Advection and pressure projection create large smooth vortices
+              throughout the fluid domain.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>1. Eulerian simulation pipeline</h2>
+
+      <div class="pipeline">
+
+        <article class="pipeline-step">
+          <span>STEP 01</span>
+
+          <h3>Ink emission</h3>
+
+          <p>
+            RGB ink and velocity are introduced through configurable source
+            regions.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 02</span>
+
+          <h3>Advection</h3>
+
+          <p>
+            Fluid properties are transported through the velocity field using
+            a semi-Lagrangian approach.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 03</span>
+
+          <h3>External forces</h3>
+
+          <p>
+            Gravity and other configurable forces modify the grid velocities.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 04</span>
+
+          <h3>Viscosity</h3>
+
+          <p>
+            Diffusion smooths velocity differences according to the selected
+            dynamic viscosity coefficient.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 05</span>
+
+          <h3>Pressure solve</h3>
+
+          <p>
+            A Poisson system is assembled and solved to obtain the fluid
+            pressure.
+          </p>
+        </article>
+
+        <article class="pipeline-step">
+          <span>STEP 06</span>
+
+          <h3>Projection</h3>
+
+          <p>
+            The pressure gradient is subtracted from velocity to enforce
+            incompressibility.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Pressure projection</h2>
+
+      <p>
+        After advection and force integration, the velocity field may contain
+        divergence. The projection stage calculates a pressure field that
+        removes this divergence.
+      </p>
+
+      <p>
+        The pressure equation is represented as a sparse Poisson system and
+        solved using a Preconditioned Conjugate Gradient solver.
+      </p>
+
+      <div class="equation-box">
+        <h3>Pressure Poisson equation</h3>
+
+        <div class="equation">
+          ∇²p = (ρ / Δt) ∇ · u*
+        </div>
+
+        <div class="equation">
+          uₙ₊₁ = u* - (Δt / ρ) ∇p
+        </div>
+
+        <p>
+          Here, u* is the intermediate velocity, p is pressure, ρ is fluid
+          density and Δt is the simulation time step.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <span class="phase-label">PHASE 02</span>
+
+      <h2>PIC/FLIP particle-grid simulation</h2>
+
+      <p>
+        The second stage extends the Eulerian solver with particles. Each
+        particle carries position, velocity and colour information while the
+        grid continues to handle pressure projection and boundary conditions.
+      </p>
+
+      <p>
+        This hybrid design combines the stability of a regular grid with the
+        reduced numerical diffusion of particle-based transport.
+      </p>
+
+      <div class="video-wrapper">
+        <video controls preload="metadata">
+          <source
+            src="video/pic_flip_fluid_demo.mp4"
+            type="video/mp4"
+          >
+
+          Your browser does not support the video element.
+        </video>
+
+        <div class="video-caption">
+          Hybrid PIC/FLIP simulation showing particle-based transport,
+          detailed vortices and reduced numerical dissipation.
+        </div>
+      </div>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/03_pic_flip_initial.webp"
+            alt="Initial stage of the PIC FLIP fluid simulation"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Initial PIC/FLIP flow</h3>
+
+            <p>
+              Particles preserve local colour and velocity information as the
+              emitted fluid enters the domain.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/04_pic_flip_developed.webp"
+            alt="Developed stage of the PIC FLIP fluid simulation"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Developed PIC/FLIP flow</h3>
+
+            <p>
+              The hybrid simulation maintains smaller vortices and sharper
+              structures as the flow develops.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Particle initialization and integration</h2>
+
+      <p>
+        Particles are sampled throughout the fluid domain, with multiple
+        particles placed inside every grid cell. A small random offset avoids
+        a perfectly regular distribution.
+      </p>
+
+      <p>
+        Particle positions are integrated using a midpoint Runge–Kutta method.
+        Velocities are interpolated from the surrounding grid values.
+      </p>
+
+      <div class="equation-box">
+        <h3>Midpoint particle integration</h3>
+
+        <div class="equation">
+          xmid = xₙ + (Δt / 2) u(xₙ)
+        </div>
+
+        <div class="equation">
+          xₙ₊₁ = xₙ + Δt u(xmid)
+        </div>
+
+        <p>
+          Particles that leave the valid domain are projected back inside the
+          simulation boundaries.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Particle-to-grid transfer</h2>
+
+      <p>
+        Particle properties are transferred to nearby grid locations using
+        bilinear weights. Each particle contributes to the four closest grid
+        points.
+      </p>
+
+      <p>
+        Separate accumulators store weighted values and total weights. Grid
+        quantities are obtained by normalizing these accumulated
+        contributions.
+      </p>
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+          <span class="feature-label">P2G</span>
+
+          <h3>Velocity transfer</h3>
+
+          <p>
+            Particle velocities are distributed to the staggered velocity
+            grid using distance-based interpolation weights.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-label">P2G</span>
+
+          <h3>Ink transfer</h3>
+
+          <p>
+            RGB colour carried by the particles is reconstructed on the grid
+            for visualization and further simulation steps.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Grid-to-particle transfer</h2>
+
+      <p>
+        After pressure projection, the corrected grid velocity must be
+        transferred back to the particles.
+      </p>
+
+      <p>
+        PIC directly interpolates the new grid velocity. FLIP instead applies
+        the change in grid velocity to the previous particle velocity, which
+        better preserves energy.
+      </p>
+
+      <div class="equation-box">
+        <h3>PIC and FLIP update</h3>
+
+        <div class="equation">
+          vPIC = interpolate(uₙ₊₁)
+        </div>
+
+        <div class="equation">
+          vFLIP = vparticle + interpolate(uₙ₊₁ - uₙ)
+        </div>
+
+        <div class="equation">
+          vparticle = 0.95 vFLIP + 0.05 vPIC
+        </div>
+
+        <p>
+          The final blend uses mostly FLIP to preserve motion, with a small PIC
+          contribution to improve stability.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>6. Method comparison</h2>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Representation</th>
+            <th>Main behaviour</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Eulerian</td>
+            <td>Fixed regular grid</td>
+            <td>
+              Stable and smooth, but semi-Lagrangian advection introduces
+              numerical diffusion and gradually removes small-scale details.
+            </td>
+          </tr>
+
+          <tr>
+            <td>PIC</td>
+            <td>Particles transferred to and from a grid</td>
+            <td>
+              Stable and resistant to noise, but repeated velocity
+              interpolation can dissipate kinetic energy.
+            </td>
+          </tr>
+
+          <tr>
+            <td>FLIP</td>
+            <td>Particles updated using grid velocity changes</td>
+            <td>
+              Preserves energy and vortices more effectively, although the
+              result can become noisier without a small PIC contribution.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="highlight">
+      <h2>Development progression</h2>
+
+      <p>
+        The first stage established the complete grid-based fluid simulation
+        pipeline, including pressure projection and incompressibility. The
+        second stage reused this solver while replacing grid-based advection
+        with particle transport and PIC/FLIP velocity updates.
+      </p>
+    </section>
+
+    <section class="code-section">
+      <h2>Source code</h2>
+
+      <p>
+        The two implementations are presented separately to show the
+        progression from a purely Eulerian solver to the final hybrid
+        particle-grid simulator.
+      </p>
+
+      <div class="code-group">
+        <h3>Eulerian implementation</h3>
+
+        <div class="code-grid">
+
+          <a
+            class="code-card"
+            href="code/eulerian/Fluid2Exercise.cpp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>Fluid2Exercise.cpp</strong>
+
+            <span>
+              Emission, advection, viscosity, pressure solve and projection
+            </span>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="code-group">
+        <h3>PIC/FLIP extension</h3>
+
+        <div class="code-grid">
+
+          <a
+            class="code-card"
+            href="code/pic-flip/Fluid2Exercise.cpp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>Fluid2Exercise.cpp</strong>
+
+            <span>
+              Particle integration, particle-grid transfers and PIC/FLIP update
+            </span>
+          </a>
+
+          <a
+            class="code-card"
+            href="code/pic-flip/Particles2.h"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>Particles2.h</strong>
+
+            <span>
+              Particle positions, velocities, colour data and storage
+            </span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 Filippo Falzi
+  </footer>
+
+</body>
+</html>
