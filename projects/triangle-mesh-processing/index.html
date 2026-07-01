@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Triangle Mesh Processing | Filippo Falzi</title>
+
+  <link rel="icon" href="/portfolio/assets/favicon.svg" type="image/svg+xml">
+
+
+  <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    main {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 82px 7%;
+    }
+
+    section {
+      margin-bottom: 96px;
+    }
+
+    .intro {
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
+    }
+
+    .tag {
+      margin-bottom: 16px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 1040px;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 7vw, 86px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .intro-text {
+      max-width: 800px;
+      color: var(--ink-soft);
+      font-size: 19px;
+    }
+
+    section > p {
+      max-width: 840px;
+      margin-bottom: 18px;
+      color: var(--stone);
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 40px;
+    }
+
+    .detail-card,
+    .code-card {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .feature-image {
+      width: 100%;
+      max-height: 680px;
+      margin-top: 35px;
+      display: block;
+      object-fit: contain;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 40px rgba(52, 50, 48, 0.08);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 35px;
+    }
+
+    .image-card {
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 16px 35px rgba(52, 50, 48, 0.06);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .image-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 45px rgba(52, 50, 48, 0.10);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 340px;
+      display: block;
+      object-fit: contain;
+      background: #e7e5e1;
+    }
+
+    .image-content {
+      padding: 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    .image-content p {
+      color: var(--stone);
+      font-size: 15px;
+    }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .code-card p {
+      margin-bottom: 18px;
+      color: var(--stone);
+      font-size: 15px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 19px;
+      background: var(--blue);
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 800;
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-3px);
+      background: var(--blue-dark);
+    }
+
+    .report-box {
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
+    }
+
+    .report-box p {
+      max-width: 720px;
+      margin: 12px 0 24px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .report-box .button {
+      background: var(--card);
+      color: var(--ink);
+    }
+
+    .report-box .button:hover {
+      background: var(--mist);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+    }
+
+    @media (max-width: 750px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
+      }
+
+      main {
+        padding-top: 54px;
+      }
+
+      .gallery,
+      .code-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-card img {
+        height: auto;
+      }
+
+      .report-box {
+        padding: 28px;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  
+    /* Floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      padding: 9px 12px 9px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      color: rgba(255, 255, 255, 0.92);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        padding: 8px 9px 8px 14px;
+      }
+
+      .site-header .brand {
+        gap: 0;
+      }
+
+      .site-header .brand-name {
+        display: none;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+    }
+
+  
+    /* Final floating navigation */
+    .site-header {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 1000;
+      width: min(980px, calc(100% - 32px));
+      min-height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 9px 14px 9px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(52, 50, 48, 0.86);
+      color: var(--white);
+      box-shadow:
+        0 18px 45px rgba(20, 20, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transform: translateX(-50%);
+    }
+
+    .site-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .site-header .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .site-header .brand-name span:last-child {
+      color: var(--mist);
+      font-weight: 700;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-header nav a {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .site-header nav a::after {
+      display: none;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateY(-1px);
+    }
+
+    body.project-page main {
+      padding-top: 126px;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        top: 10px;
+        width: calc(100% - 20px);
+        min-height: 58px;
+        gap: 8px;
+        padding: 8px 8px 8px 20px;
+      }
+
+      .site-header .brand-name {
+        display: flex;
+        gap: 5px;
+        font-size: 15px;
+      }
+
+      .site-header nav {
+        gap: 0;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+        font-size: 11px;
+        letter-spacing: 0.015em;
+      }
+
+      body.project-page main {
+        padding-top: 106px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .site-header {
+        padding-left: 16px;
+      }
+
+      .site-header .brand-name {
+        font-size: 14px;
+      }
+
+      .site-header nav a {
+        padding-inline: 6px;
+        font-size: 10.5px;
+      }
+    }
+
+  
+    /* Brand alignment correction */
+    .site-header {
+      position: fixed;
+      justify-content: flex-end;
+      padding: 9px 14px 9px 30px;
+    }
+
+    .site-header .brand {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+
+    .site-header nav {
+      margin-left: auto;
+    }
+
+    @media (max-width: 640px) {
+      .site-header {
+        position: fixed;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 8px 9px 8px 20px;
+      }
+
+      .site-header .brand {
+        top: 50%;
+        left: 20px;
+        padding: 0;
+      }
+
+      .site-header nav {
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .site-header nav a {
+        padding: 9px 8px;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body id="top" class="project-page">
+
+  <header class="site-header">
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="intro">
+      <p class="tag">
+        Computational Geometry · C++ · University Project · 2025
+      </p>
+
+      <h1>
+        Triangle Mesh Processing and Parameterization
+      </h1>
+
+      <p class="intro-text">
+        A computational geometry project focused on the analysis,
+        processing and parameterization of triangular meshes using C++,
+        graph algorithms and numerical methods.
+      </p>
+
+      <div class="details">
+
+        <div class="detail-card">
+          <strong>Technologies</strong>
+          C++, Eigen, MeshLab, PLY and OBJ
+        </div>
+
+        <div class="detail-card">
+          <strong>Topics</strong>
+          Mesh analysis, boundaries, geodesic distances and UV mapping
+        </div>
+
+        <div class="detail-card">
+          <strong>Role</strong>
+          Algorithm implementation, testing and result analysis
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Project overview</h2>
+
+      <p>
+        This project explores a set of algorithms used to process and analyse
+        triangular meshes. The work includes geometric statistics, boundary
+        detection, geodesic distance computation and texture parameterization.
+      </p>
+
+      <p>
+        The algorithms were implemented in C++ and tested on meshes with
+        different levels of complexity, including low-resolution models and
+        larger datasets containing thousands of vertices and triangles.
+      </p>
+
+      <img
+        class="feature-image"
+        src="images/uv_mannequin_textured.jpg"
+        alt="Textured mannequin mesh with UV coordinates"
+      >
+    </section>
+
+    <section>
+      <h2>Mesh statistics</h2>
+
+      <p>
+        The first part of the project calculates geometric information such
+        as triangle area, internal angles, edge length and shape quality.
+        Degenerate or low-quality triangles are identified and highlighted
+        to make problematic areas easier to analyse.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/mesh_statistics_bunny.jpg"
+            alt="Bunny triangle mesh"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Bunny mesh</h3>
+            <p>
+              Visual inspection of the triangular structure and highlighted
+              low-quality regions.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/mesh_statistics_bunny_results.jpg"
+            alt="Bunny mesh statistics results"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Bunny statistics</h3>
+            <p>
+              Numerical output including mesh dimensions, triangle areas,
+              angles, edge lengths and shape factors.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/mesh_statistics_athena.jpg"
+            alt="Athena bust triangle mesh"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Athena Bust mesh</h3>
+            <p>
+              Testing the analysis algorithm on a considerably denser
+              geometric model.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/mesh_statistics_athena_results.jpg"
+            alt="Athena bust mesh statistics results"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Athena Bust statistics</h3>
+            <p>
+              Statistical analysis of a mesh containing a large number
+              of vertices and triangles.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Boundary detection and geodesic distance</h2>
+
+      <p>
+        Mesh edges are classified as internal or external in order to identify
+        the boundary. A graph-based shortest-path algorithm is then used to
+        calculate the distance between every vertex and the nearest boundary.
+      </p>
+
+      <p>
+        These distances are converted into colour values, creating a visual
+        representation of how far each region is from the external contour.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/boundary_nefertiti.jpg"
+            alt="Nefertiti mesh coloured according to boundary distance"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Geodesic distance visualization</h3>
+            <p>
+              Colour mapping represents the distance from each vertex to the
+              nearest mesh boundary.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/boundary_nefertiti_results.jpg"
+            alt="Nefertiti mesh boundary computation results"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Boundary computation</h3>
+            <p>
+              Console output showing boundary edges, mesh information and
+              algorithm execution results.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>UV parameterization</h2>
+
+      <p>
+        The final part maps a three-dimensional mesh onto a two-dimensional
+        texture domain. Boundary vertices are assigned fixed UV coordinates,
+        while the positions of internal vertices are obtained by solving a
+        linear system.
+      </p>
+
+      <p>
+        Dense and sparse matrix implementations were developed and compared.
+        The sparse approach allows larger meshes to be processed more
+        efficiently.
+      </p>
+
+      <div class="gallery">
+
+        <article class="image-card">
+          <img
+            src="images/uv_mannequin_textured.jpg"
+            alt="Mannequin mesh with UV checker texture"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Mannequin parameterization</h3>
+            <p>
+              The checker texture makes UV distortion and orientation visible
+              across the three-dimensional model.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/uv_mannequin_wireframe.jpg"
+            alt="Two-dimensional UV wireframe for mannequin mesh"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Mannequin UV domain</h3>
+            <p>
+              Two-dimensional distribution of the mesh vertices after
+              parameterization.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/uv_laurana_textured.jpg"
+            alt="Laurana mesh with UV checker texture"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Laurana textured mesh</h3>
+            <p>
+              Application of the parameterization algorithm to a more complex
+              and detailed model.
+            </p>
+          </div>
+        </article>
+
+        <article class="image-card">
+          <img
+            src="images/uv_laurana_wireframe.jpg"
+            alt="Two-dimensional UV wireframe for Laurana mesh"
+            loading="lazy"
+          >
+
+          <div class="image-content">
+            <h3>Laurana UV domain</h3>
+            <p>
+              Flattened representation used to evaluate the distribution and
+              deformation of the texture coordinates.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>Source code</h2>
+
+      <p>
+        The source files contain the main implementations developed for mesh
+        statistics, boundary processing and texture parameterization.
+      </p>
+
+      <div class="code-grid">
+
+        <article class="code-card">
+          <h3>Mesh statistics</h3>
+          <p>
+            Computes geometric measurements and identifies triangles with
+            problematic shape factors.
+          </p>
+          <a class="button" href="code/meshStatistic.cpp">
+            View code
+          </a>
+        </article>
+
+        <article class="code-card">
+          <h3>Mesh boundary</h3>
+          <p>
+            Detects internal and external edges and computes distances from
+            mesh boundaries.
+          </p>
+          <a class="button" href="code/meshBoundary.cpp">
+            View code
+          </a>
+        </article>
+
+        <article class="code-card">
+          <h3>Dense parameterization</h3>
+          <p>
+            Builds and solves the UV parameterization system using dense
+            matrices.
+          </p>
+          <a class="button" href="code/meshTexture-Dense.cpp">
+            View code
+          </a>
+        </article>
+
+        <article class="code-card">
+          <h3>Sparse parameterization</h3>
+          <p>
+            Uses sparse matrices and solvers to process larger meshes more
+            efficiently.
+          </p>
+          <a class="button" href="code/meshTexture-Sparse.cpp">
+            View code
+          </a>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="report-box">
+      <h2>Project report</h2>
+
+      <p>
+        The complete report includes the tests, numerical outputs and visual
+        results produced for each stage of the project.
+      </p>
+
+      <a
+        class="button"
+        href="report/Memoria%20practica_FilippoFalzi.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open project report
+      </a>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+</body>
+</html>
+
