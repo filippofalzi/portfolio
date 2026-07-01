@@ -6,7 +6,22 @@
 
   <title>Mass-Spring Cloth Simulation | Filippo Falzi</title>
 
+
   <style>
+    :root {
+      --ink: #343230;
+      --ink-soft: #4c463a;
+      --stone: #62615d;
+      --blue: #617392;
+      --blue-dark: #465876;
+      --sand: #857868;
+      --mist: #d7cecd;
+      --paper: #eeece8;
+      --card: #faf9f7;
+      --white: #ffffff;
+      --line: rgba(52, 50, 48, 0.14);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -18,134 +33,215 @@
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f5f5f5;
-      color: #151515;
-      line-height: 1.6;
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
     }
 
     header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 20px;
-      padding: 24px 8%;
-      background: #111;
-      color: white;
+      min-height: 76px;
+      padding: 16px 7%;
+      background: rgba(52, 50, 48, 0.95);
+      color: var(--white);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
     }
 
-    header a {
-      color: white;
+    .brand {
+      color: var(--white);
       text-decoration: none;
     }
 
+    .brand-name {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-name span:last-child {
+      color: var(--mist);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 2px;
+      background: var(--mist);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
+    }
+
     main {
-      max-width: 1200px;
+      width: min(1200px, 100%);
       margin: auto;
-      padding: 80px 8%;
+      padding: 82px 7%;
     }
 
     section {
-      margin-bottom: 95px;
+      margin-bottom: 96px;
     }
 
     h1 {
       max-width: 1050px;
-      margin-bottom: 30px;
-      font-size: clamp(42px, 7vw, 86px);
-      line-height: 1;
+      margin-bottom: 28px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 7vw, 88px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
     }
 
     h2 {
       margin-bottom: 20px;
-      font-size: 36px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
     }
 
     h3 {
       margin-bottom: 10px;
       font-size: 22px;
+      line-height: 1.2;
     }
 
     section > p {
       max-width: 850px;
-      margin-bottom: 20px;
-      color: #555;
+      margin-bottom: 18px;
+      color: var(--stone);
     }
 
     .intro {
-      margin-bottom: 90px;
+      position: relative;
+      margin-bottom: 92px;
+      padding-bottom: 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 150px;
+      height: 5px;
+      background: var(--blue);
     }
 
     .tag {
-      margin-bottom: 15px;
-      color: #666;
+      margin-bottom: 16px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     .intro-text {
       max-width: 820px;
-      color: #555;
+      color: var(--ink-soft);
       font-size: 19px;
     }
 
     .details {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
       margin-top: 40px;
     }
 
-    .detail-card {
-      padding: 25px;
-      background: white;
+    .detail-card,
+    .feature-card,
+    .integration-card {
+      padding: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
     }
 
     .detail-card strong {
       display: block;
       margin-bottom: 8px;
+      color: var(--ink);
     }
 
     .video-wrapper {
-      margin-top: 35px;
+      margin-top: 36px;
       overflow: hidden;
-      background: #111;
+      background: var(--ink);
+      box-shadow: 0 24px 55px rgba(52, 50, 48, 0.12);
     }
 
     video {
       width: 100%;
       max-height: 700px;
       display: block;
-      background: #111;
+      background: var(--ink);
     }
 
     .video-caption {
       padding: 20px;
-      background: white;
-      color: #666;
+      background: var(--card);
+      color: var(--stone);
+      border-top: 1px solid var(--line);
     }
 
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
-      margin-top: 35px;
-    }
-
-    .feature-card {
-      padding: 28px;
-      background: white;
+      gap: 22px;
+      margin-top: 34px;
     }
 
     .feature-card p {
-      color: #666;
+      color: var(--stone);
     }
 
     .feature-label {
       display: block;
       margin-bottom: 12px;
-      color: #777;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 0.08em;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.09em;
     }
 
     .integration-grid {
@@ -155,53 +251,55 @@
       margin-top: 35px;
     }
 
-    .integration-card {
-      padding: 24px;
-      background: white;
-    }
-
     .integration-card span {
       display: block;
       margin-bottom: 10px;
-      color: #777;
-      font-size: 14px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
     }
 
     .integration-card p {
-      color: #666;
+      color: var(--stone);
       font-size: 15px;
     }
 
     .equation-box {
       margin-top: 35px;
-      padding: 32px;
-      background: #111;
-      color: white;
+      padding: 34px;
+      background: var(--ink);
+      color: var(--white);
+      border-left: 6px solid var(--blue);
     }
 
     .equation-box p {
       max-width: 850px;
-      color: #ccc;
+      color: rgba(255, 255, 255, 0.72);
     }
 
     .equation {
       margin: 22px 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--white);
       font-family: "Courier New", monospace;
       font-size: 19px;
-      color: white;
-      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.10);
     }
 
     .code-section {
-      padding: 40px;
-      background: #111;
-      color: white;
+      padding: 42px;
+      background: var(--ink);
+      color: var(--white);
+      border-top: 6px solid var(--blue);
     }
 
     .code-section > p {
       max-width: 850px;
       margin-bottom: 30px;
-      color: #ccc;
+      color: rgba(255, 255, 255, 0.72);
     }
 
     .code-group {
@@ -221,17 +319,19 @@
     .code-card {
       display: block;
       padding: 22px;
-      border: 1px solid #444;
-      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
       text-decoration: none;
       transition:
+        transform 0.2s ease,
         background 0.2s ease,
         border-color 0.2s ease;
     }
 
     .code-card:hover {
-      background: #222;
-      border-color: #888;
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--mist);
     }
 
     .code-card strong {
@@ -240,35 +340,61 @@
     }
 
     .code-card span {
-      color: #aaa;
+      color: rgba(255, 255, 255, 0.62);
       font-size: 14px;
     }
 
     .highlight {
-      padding: 35px;
-      background: white;
-      border-left: 5px solid #111;
+      padding: 36px;
+      background: var(--card);
+      border-left: 6px solid var(--blue);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
     }
 
     .highlight p {
       max-width: 850px;
-      color: #555;
+      color: var(--stone);
     }
 
     footer {
-      padding: 30px 8%;
-      background: #111;
-      color: #aaa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 7%;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.58);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 14px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
     }
 
     @media (max-width: 750px) {
       header {
+        position: relative;
         align-items: flex-start;
         flex-direction: column;
+        padding: 18px 7%;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 13px;
       }
 
       main {
-        padding-top: 50px;
+        padding-top: 54px;
       }
 
       .feature-grid,
@@ -279,20 +405,31 @@
       .code-section {
         padding: 28px;
       }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
+
 </head>
 
-<body>
+<body id="top">
 
   <header>
-    <a href="../../index.html">
-      <strong>FILIPPO FALZI</strong>
+    <a class="brand" href="../../index.html" aria-label="Filippo Falzi home">
+      <span class="brand-name">
+        <span>Filippo</span>
+        <span>Falzi</span>
+      </span>
     </a>
 
-    <a href="../../index.html">
-      Back to portfolio
-    </a>
+    <nav aria-label="Primary navigation">
+      <a href="../../index.html#projects">Projects</a>
+      <a href="../../about.html">About</a>
+      <a href="mailto:filippo.falzi@live.com">Contact</a>
+    </nav>
   </header>
 
   <main>
@@ -777,7 +914,8 @@
   </main>
 
   <footer>
-    © 2026 Filippo Falzi
+    <span>© 2026 Filippo Falzi</span>
+    <a href="#top">Back to top ↑</a>
   </footer>
 
 </body>
